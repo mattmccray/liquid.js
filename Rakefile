@@ -1,4 +1,11 @@
 
+task :default=>:test
+
+desc "Test javascript in Rhino... Requires Java"
+task :test do
+  puts `java -jar test/env/js.jar test/env/test.harness.js`
+end
+
 
 desc "Compiles from source scripts into dist/liquid.js"
 task :build do

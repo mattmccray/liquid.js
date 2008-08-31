@@ -1,0 +1,267 @@
+<html>
+  <script src="../etc/mootools-1.2-core.js"></script>
+  <script src="../dist/liquid.js"></script>
+  <script>
+    var Tests = (function() { 
+      // helper functions...
+      function render(src, ctx) {
+        return Liquid.parse(src).render(ctx);
+      }
+      return {
+
+        title: "Liquid.js",
+        description: "Runs through all the main tags and filters to ensure compatibility with the Ruby version.",
+        auto_test: true,
+      
+        'Verify API': function() {
+          assertDefined( typeof Liquid,           "Liquid is missing" );
+          assertDefined( typeof Liquid.Template,  "Liquid.Template is missing" );
+          assertDefined( typeof Liquid.Drop,      "Liquid.Drop is missing" );
+          assertDefined( typeof Liquid.Tag,       "Liquid.Tag is missing" );
+          assertDefined( typeof Liquid.Block,     "Liquid.Tag is missing" );
+        },
+
+        note1: "Testing variables...",
+
+        "{{ 'string literal' }}": function() {
+          assertEqual( 'string literal', render('{{"string literal"}}')  )
+          assertEqual( 'string literal', render('{{ "string literal" }}')  )
+          assertEqual( 'string literal', render("{{'string literal'}}")  )
+          assertEqual( 'string literal', render("{{ 'string literal' }}")  )
+          assertEqual( 'string "literal"', render("{{'string \"literal\"'}}")  )
+          assertEqual( 'string "literal"', render("{{ 'string \"literal\"' }}")  )
+        },
+
+        "{{ 10 }}": function() {
+          assertEqual( '10', render('{{10}}')  )
+          assertEqual( '10', render('{{ 10 }}')  )
+        },
+
+        "{{ 5.5 }}": function() {
+          assertEqual( '5.5', render('{{5.5}}')  )
+          assertEqual( '5.5', render('{{ 5.5 }}')  )
+        },
+
+        "{{ (1..5) }}": function() {
+          assertEqual( '1,2,3,4,5', render('{{(1..5)}}')  )
+          assertEqual( '1,2,3,4,5', render('{{ (1..5) }}')  )
+        },
+        
+        '{{ varname }}': function() {
+          assertEqual( 'Bob', render("{{ user }}", {user:'Bob'})  )
+        },
+        
+        '{{ parent.child }}': function() {
+          assertEqual( 'Bob', render("{{ user.name }}", {user:{ name:'Bob' }})  )
+        },
+
+        '{{ collection[0] }}': function() {
+          assertEqual( 'Bob', render("{{ users[0] }}", {users:['Bob']})  )
+        },
+
+        '{{ collection[0].child }}': function() {
+          assertEqual( 'Bob', render("{{ users[0].name }}", {users:[{name:'Bob'}]})  )
+        },
+        
+        note2: "Testing filters...",
+
+        '{{ varname | size }}': function() {
+          assertEqual( '3', render("{{user|size}}", {user:'Bob'})  )
+          assertEqual( '3', render("{{ user | size }}", {user:'Bob'})  )
+        },
+        
+        '{{ varname | upcase }}': function() {
+          assertEqual( 'BOB', render("{{user|upcase}}", {user:'Bob'})  )
+          assertEqual( 'BOB', render("{{ user | upcase }}", {user:'Bob'})  )
+        },
+
+        '{{ varname | downcase }}': function() {
+          assertEqual( 'bob', render("{{user|downcase}}", {user:'Bob'})  )
+          assertEqual( 'bob', render("{{ user | downcase }}", {user:'Bob'})  )
+        },
+        
+        '{{ varname | capitalize }}': function() {
+          assertEqual( 'Bob', render("{{user|capitalize}}", {user:'bob'})  )
+          assertEqual( 'Bob', render("{{ user | capitalize }}", {user:'bob'})  )
+        },
+        
+        '{{ varname | escape }}': function() {
+          assertEqual( '&lt;br/&gt;', render("{{'<br/>'|escape}}")  )
+          assertEqual( '&lt;br/&gt;', render("{{ '<br/>' | escape }}")  )
+          assertEqual( 'this &amp; &quot;that&quot;', render("{{ 'this & \"that\"' | escape }}")  )
+        },
+
+        '{{ varname | escape }}': function() {
+          assertEqual( '&lt;br/&gt;', render("{{'<br/>'|escape}}")  )
+          assertEqual( '&lt;br/&gt;', render("{{ '<br/>' | escape }}")  )
+          assertEqual( '&lt;br/&gt;', render("{{ '<br/>' | h }}")  )
+          assertEqual( 'this &amp; &quot;that&quot;', render("{{ 'this & \"that\"' | escape }}")  )
+        },
+
+        '{{ varname | truncate }}': function() {
+          assertEqual( 
+            'I am the very model of a modern major general, rea...', 
+            render("{{'I am the very model of a modern major general, really.'|truncate}}")
+          );
+          assertEqual( 
+            'I am the very model of a modern major general, rea...', 
+            render("{{'I am the very model of a modern major general, really.' | truncate}}")
+          );
+        },
+
+        '{{ varname | truncate:2 }}': function() {
+          assertEqual( 'Bo...', render("{{user|truncate:2}}", {user:'Bob'})  )
+          assertEqual( 'Bo...', render("{{ user | truncate:2 }}", {user:'Bob'})  )
+          assertEqual( 'Bo...', render("{{ user | truncate: 2 }}", {user:'Bob'})  )
+        },
+
+        "{{ varname | truncate:1,'-' }}": function() {
+          assertEqual( 'B-', render("{{user|truncate:1,'-'}}", {user:'Bob'})  )
+          assertEqual( 'B-', render("{{ user | truncate:1,'-' }}", {user:'Bob'})  )
+          assertEqual( 'B-', render("{{ user | truncate: 1,'-' }}", {user:'Bob'})  )
+          assertEqual( 'B-', render("{{ user | truncate: 1, '-' }}", {user:'Bob'})  )
+        },
+
+        '{{ varname | truncatewords }}': function() {
+          assertEqual( 
+            'a b c d e f g h i j k l m n o...', 
+            render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords}}")
+          );
+          assertEqual( 
+            'a b c d e f g h i j k l m n o...', 
+            render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords }}")
+          );
+        },
+
+        '{{ varname | truncatewords:5 }}': function() {
+          assertEqual( 
+            'a b c d e...', 
+            render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords:5}}")
+          );
+          assertEqual( 
+            'a b c d e...', 
+            render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords:5 }}")
+          );
+        },
+
+        "{{ varname | truncatewords:5,'-' }}": function() {
+          assertEqual( 
+            'a b c d e-', 
+            render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords:5,'-'}}")
+          );
+          assertEqual( 
+            'a b c d e-', 
+            render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords:5,'-' }}")
+          );
+        },
+        
+      }
+    })();
+  </script>
+  <script src="env/test-runner.js"></script>
+</html>
+
+
+<!--
+
+  testVerifyInternals: function () {
+    assertDefined( typeof window.methodList,          "methodList is missing" );
+    assertDefined( typeof window.assertionCount,      "assertionCount is missing" );
+    assertDefined( typeof window.assertionFailCount,  "assertionFailCount is missing" );
+    assertDefined( typeof window.assertionErrorCount, "assertionErrorCount is missing" );
+
+    assertDefined( typeof window.assert,             "assert in missing" );
+    assertDefined( typeof window.assertFalse,        "assertFalse in missing" );
+    assertDefined( typeof window.assertEqual,        "assertEqual in missing" );
+    assertDefined( typeof window.assertNotEqual,     "assertNotEqual in missing" );
+    assertDefined( typeof window.assertNull,         "assertNull in missing" );
+    assertDefined( typeof window.assertNotNull,      "assertNotNull in missing" );
+    assertDefined( typeof window.assertDefined,      "assertDefined in missing" );
+    assertDefined( typeof window.assertUndefined,    "assertUndefined in missing" );
+  },
+
+  testForNamespaceContaminates: function () {
+    assertUndefined( typeof window.$,               '$ should not be defined' );
+    assertUndefined( typeof window.log,             'log should not be defined' );
+    assertUndefined( typeof window.show_if,         'show_if should not be defined');
+    assertUndefined( typeof window.assertError,     'assertError should not be defined' );
+    assertUndefined( typeof window.forEach,         'forEach should not be defined' );
+    assertUndefined( typeof window.setStatus,       'setStatus should not be defined' );
+    assertUndefined( typeof window.setResults,      'setResults should not be defined' );
+  },
+
+  testAssertUndefined: function () {
+    assertUndefined( typeof crap )
+  },
+
+  testAssert: function () {
+    assert(true);
+  },
+
+  testAssertDefined: function () {
+    assertDefined(String)
+    assertDefined(typeof Tests)
+  }, 
+
+  testAssertNotEqual: function () {
+    assertNotEqual(1, 2)
+  },
+
+  testAssertFalse: function () {
+    assertFalse(false);
+  },
+
+
+  testAssertNull: function () {
+    assertNull(null);
+  },
+
+  testAssertNotNull: function () {
+    assertNotNull("");
+  },
+
+  testAssertEqual: function () {
+    assertEqual(1, 1)
+  },
+
+  note: "The following tests should all fail:",
+
+  testFailAssertFalse: function () {
+    assertFalse(true);
+  },
+
+  testFailAssertNull: function () {
+    assertNull("");
+  },
+
+  testFailAssertNotNull: function () {
+    assertNotNull(null);
+  },
+
+  testFailAssertEqual: function () {
+    assertEqual(1, 2)
+  },
+
+  testFailAssertNotEqual: function () {
+    assertNotEqual(1, 1)
+  },
+
+  testFailAssert: function () {
+    assert(false);
+  },
+
+  testFailAssertDefined: function () {
+    assertDefined(typeof crap)
+  }, 
+
+  testFailException: function () {
+    foo.bar();
+  },
+
+  testFailAssertUndefined: function () {
+    assertUndefined( typeof String )
+  },
+  
+  note2: "Test results should read:<br/>36 assertions, 28 passed, 8 failed, 1 error(s)."
+
+-->
