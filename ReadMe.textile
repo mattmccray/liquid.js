@@ -35,19 +35,24 @@ h2. Differences
   alert( tmpl.render({ current_user:'M@' }));
   
 </script>
-
 <!-- Browsers ignore script blocks with an unrecognized type.  -->
 <!-- Makes for pretty good inline template storage.  -->
-
 <script type="text/liquid" id="myOtherTemplate">
   Hello, {{ current_user }}!
 </script></pre>
 
 h2. Known Issues
 
-# Need good testing framework to put it through it's paces.
 # Not tested in Internet Exploder. Known to work in Safari 3.1+ and FireFox 3+.
 
 h2. References:
 
 * "http://wiki.shopify.com/UsingLiquid":http://wiki.shopify.com/UsingLiquid
+
+h3. Todo
+
+* Would like to remove dependency on Mootools.
+* Need good testing framework to put it through it's paces.;
+** Use JavaScriptMVC's test framework?
+** Use Rhino for console testing?
+
