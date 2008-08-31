@@ -1,0 +1,59 @@
+<html>
+  <script src="../etc/mootools-1.2-core.js"></script>
+  <script src="../dist/liquid.js"></script>
+  <script>
+    var TopUserDrop = new Class({
+      Extends: Liquid.Drop,
+      name: function()  {
+        return "Top User Name!!!"
+      }
+    });
+    
+    function parseIt() {
+      var src = document.getElementById('src').value;
+      var tmpl = Liquid.parse(src);
+      var html = tmpl.render({
+        topUser: new TopUserDrop(),
+        user: 'DarthAPO',
+        today: new Date(),
+        users: [
+          { name:'Matt' },
+          { name:'Dan' },
+          { name:'Sam' }
+        ]
+      });
+      document.getElementById('output').value = html;
+      document.getElementById('outputHTML').innerHTML = html;
+    }
+    
+    Liquid.readTemplateFile = function(path) {
+      var elem = document.getElementById(path);
+      if( elem ) {
+        return elem.value;
+      } else {
+        throw "Could not find template for "+ path;
+      }
+    }
+  </script>
+  <body>
+    <textarea id="src" rows="10" cols="60">{{ user }} says hi!
+
+{% for user in users %}
+  * {{ user.name }}
+{% endfor %}
+
+Maybe: {{ users.0.name }}
+
+{% include 'testInclude' with user %}
+
+The end.</textarea><br/>
+      <button onclick="parseIt()">Parse</button>
+      <hr/>
+      <textarea id="output" rows="10" cols="60"></textarea><br/>
+      Rendered:
+      <div id="outputHTML">
+      </div>
+      Template:
+      <textarea id="testInclude" rows="10" cols="60">Hello! {{ user }}, how are you?</textarea>
+  </body>
+</html>
