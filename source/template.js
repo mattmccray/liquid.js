@@ -63,6 +63,7 @@ Template.tokenize = function(src) {
   var tokens = src.split( TemplateParser );
   // removes the rogue empty element at the beginning of the array
   if(tokens[0] == ''){ tokens.shift(); }
+//  console.log("Source tokens:", tokens)
   return tokens;
 }
 

@@ -113,9 +113,12 @@ var Liquid = (function(){
     this.nodelist = this.nodelist || [];
     $A(this.nodelist).empty();
     var token = tokens.shift();
-    while(token) {
+    tokens.push(''); // To ensure we don't lose the last token passed in...
+    while(tokens.length) { 
+
       if( /^\{\%/.test(token) ) { // It's a tag...
         var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
+        
         if(tagParts) {
           // if we found the proper block delimitor just end parsing here and let the outer block proceed
           if( this.blockDelimiter == tagParts[1] ) {
@@ -132,7 +135,7 @@ var Liquid = (function(){
         }
       } else if(/^\{\{/.test(token)) { // It's a variable...
         this.nodelist.push( this.createVariable(token) );
-      } else if(token != '') {
+      } else { //if(token != '') {
         this.nodelist.push( token );
       } // Ignores tokens that are empty
       token = tokens.shift(); // Assign the next token to loop again...
@@ -492,6 +495,7 @@ Template.tokenize = function(src) {
   var tokens = src.split( TemplateParser );
   // removes the rogue empty element at the beginning of the array
   if(tokens[0] == ''){ tokens.shift(); }
+//  console.log("Source tokens:", tokens)
   return tokens;
 }
 
@@ -696,7 +700,7 @@ Template.registerTag( 'cache', new Class({
   },
   render: function(context) {
     var output = this.parent(context);
-    context.scopes[context.scopes.length -1][this.to] = $splat(output).join('');
+    context.scopes.getLast()[this.to] = $splat(output).join('');
     return '';
   }
 }));
@@ -935,7 +939,7 @@ Template.registerTag( 'for', new Class({
         context.set( 'forloop', {
           name:   self.name,
           length: length,
-          index:  (index += 1),
+          index:  (index + 1),
           index0: index,
           rindex: (length - index),
           rindex0:(length - index - 1),
@@ -1022,7 +1026,7 @@ Template.registerTag( 'ifchanged', new Class({
     var self = this,
         output = '';
     context.stack(function(){
-      var results = self.renderAll(self.nodelist, context);
+      var results = self.renderAll(self.nodelist, context).join('');
       if(results != context.registers['ifchanged']) {
         output = results;
         context.registers['ifchanged'] = output;
@@ -1065,8 +1069,9 @@ Template.registerTag( 'include', new Class({
         output   = '';
     context.stack(function(){
       self.attributes.each(function(value, key){
-        context.set(key, value);
+        context.set(key, context.get(value));
       })
+
       if($type(variable) == 'array') {
         output = variable.map(function(variable){
           context.set( self.templateNameVar, variable );

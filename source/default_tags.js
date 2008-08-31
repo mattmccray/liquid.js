@@ -38,7 +38,7 @@ Template.registerTag( 'cache', new Class({
   },
   render: function(context) {
     var output = this.parent(context);
-    context.scopes[context.scopes.length -1][this.to] = $splat(output).join('');
+    context.scopes.getLast()[this.to] = $splat(output).join('');
     return '';
   }
 }));
@@ -277,7 +277,7 @@ Template.registerTag( 'for', new Class({
         context.set( 'forloop', {
           name:   self.name,
           length: length,
-          index:  (index += 1),
+          index:  (index + 1),
           index0: index,
           rindex: (length - index),
           rindex0:(length - index - 1),
@@ -364,7 +364,7 @@ Template.registerTag( 'ifchanged', new Class({
     var self = this,
         output = '';
     context.stack(function(){
-      var results = self.renderAll(self.nodelist, context);
+      var results = self.renderAll(self.nodelist, context).join('');
       if(results != context.registers['ifchanged']) {
         output = results;
         context.registers['ifchanged'] = output;
@@ -407,8 +407,9 @@ Template.registerTag( 'include', new Class({
         output   = '';
     context.stack(function(){
       self.attributes.each(function(value, key){
-        context.set(key, value);
+        context.set(key, context.get(value));
       })
+
       if($type(variable) == 'array') {
         output = variable.map(function(variable){
           context.set( self.templateNameVar, variable );

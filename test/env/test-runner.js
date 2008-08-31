@@ -1,16 +1,13 @@
 /*
   = Test Framework
-    version 1.0
+    version 1.1
 
   This is a simple JavaScript test framework.
 
   = TODO:
 
    * Add support for calling Tests.setup() and Tests.teardown()
-   * Add Test.auto_test check...
    * Documentation!
-   * Add support for methods that don't start with 'test'?
-   * Make test method names more English?
 */
 
 // We're gonna run all this in it's own scope so it doesn't pollute the test namespace
@@ -143,13 +140,13 @@
       div ('&nbsp;', {id:'work-area'})
     )
   );
-
+  
   window.assertionCount = 0;
   window.assertionFailCount = 0;
   window.assertionErrorCount = 0;
   
   var assertionFailures = [];
-
+  
   // Exported functions
   window.runAllTests = function() {
     var errors = [];

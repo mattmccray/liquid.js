@@ -11,9 +11,12 @@ var Block = new Class({
     this.nodelist = this.nodelist || [];
     $A(this.nodelist).empty();
     var token = tokens.shift();
-    while(token) {
+    tokens.push(''); // To ensure we don't lose the last token passed in...
+    while(tokens.length) { 
+
       if( /^\{\%/.test(token) ) { // It's a tag...
         var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
+        
         if(tagParts) {
           // if we found the proper block delimitor just end parsing here and let the outer block proceed
           if( this.blockDelimiter == tagParts[1] ) {
@@ -30,7 +33,7 @@ var Block = new Class({
         }
       } else if(/^\{\{/.test(token)) { // It's a variable...
         this.nodelist.push( this.createVariable(token) );
-      } else if(token != '') {
+      } else { //if(token != '') {
         this.nodelist.push( token );
       } // Ignores tokens that are empty
       token = tokens.shift(); // Assign the next token to loop again...
