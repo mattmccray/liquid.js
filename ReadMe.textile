@@ -52,7 +52,5 @@ h2. References:
 h3. Todo
 
 * Would like to remove dependency on Mootools.
-* Need good testing framework to put it through it's paces.;
-** Use JavaScriptMVC's test framework?
-** Use Rhino for console testing?
+* Add Rhino support for console-based testing?
 

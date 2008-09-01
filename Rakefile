@@ -1,9 +1,10 @@
 
-task :default=>:test
 
 desc "Test javascript in Rhino... Requires Java"
 task :test do
-  puts `java -jar test/env/js.jar test/env/test.harness.js`
+  # Yeah, doesn't really work right yet
+  #puts `java -jar test/env/js.jar test/env/test.harness.js`
+  puts "Open test/liquid-tests.html in your browser..."
 end
 
 
