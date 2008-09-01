@@ -1,10 +1,15 @@
 
+desc "Test javascript in Adobe AIR... Required AIR SDK"
+task :test_air do
+  puts `adl test-app.xml`
+end
+
 
 desc "Test javascript in Rhino... Requires Java"
 task :test do
   # Yeah, doesn't really work right yet
   #puts `java -jar test/env/js.jar test/env/test.harness.js`
-  puts "Open test/liquid-tests.html in your browser..."
+  puts "Not working yet. But you can open test/liquid-tests.html in your browser..."
 end
 
 

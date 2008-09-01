@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<application version="1.0" xmlns="http://ns.adobe.com/air/application/1.1">
+
+  <id>com.mattmccray.liquid.test</id>
+
+  <!-- Used as the filename for the application. Required. -->
+  <filename>LiquidTests</filename>
+
+  <!-- The name that is displayed in the AIR application installer. Optional. -->
+  <name>Liquid Tests</name>
+
+  <!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
+  <version>0.1</version>
+
+  <!-- Description, displayed in the AIR application installer. Optional. -->
+  <description>Application for running tests under Adobe Air.</description>
+
+  <!-- Settings for the application's initial window. Required. -->
+  <initialWindow>
+    <!-- The main SWF or HTML file of the application. Required. -->
+    <!-- Note: In Flex Builder, the SWF reference is set automatically. -->
+    <content>test/liquid-air-tests.html</content>
+    
+    <!-- The title of the main window. Optional. -->
+    <title>Liquid.js Tests</title>
+
+    <!-- The type of system chrome to use (either "standard" or "none"). Optional. Default standard. -->
+    <systemChrome>standard</systemChrome>
+
+    <!-- Whether the window is transparent. Only applicable when systemChrome is none. Optional. Default false. -->
+    <!--<transparent>false</transparent>-->
+
+    <!-- Whether the window is initially visible. Optional. Default false. -->
+    <visible>true</visible>
+
+    <!-- Whether the user can minimize the window. Optional. Default true. -->
+    <minimizable>true</minimizable>
+
+    <!-- Whether the user can maximize the window. Optional. Default true. -->
+    <maximizable>true</maximizable>
+
+    <!-- Whether the user can resize the window. Optional. Default true. -->
+    <resizable>true</resizable>
+
+    <!-- The window's initial width. Optional. -->
+    <width>800</width>
+
+    <!-- The window's initial height. Optional. -->
+    <height>600</height>
+
+    <!-- The window's initial x position. Optional. -->
+    <x>100</x>
+
+    <!-- The window's initial y position. Optional. -->
+    <y>100</y>
+
+    <!-- The window's minimum size, specified as a width/height pair, such as "400 200". Optional. -->
+    <minSize>600 400</minSize>
+
+    <!-- The window's initial maximum size, specified as a width/height pair, such as "1600 1200". Optional. -->
+    <!--<maxSize>1600 1200</maxSize>-->
+  </initialWindow>
+
+  <!-- The subpath of the standard default installation location to use. Optional. -->
+  <!-- <installFolder></installFolder> -->
+
+  <!-- The subpath of the Windows Start/Programs menu to use. Optional. -->
+  <!-- <programMenuFolder></programMenuFolder> -->
+
+  <!-- The icon the system uses for the application. For at least one resolution,
+     specify the path to a PNG file included in the AIR package. Optional. -->
+  <!-- <icon>
+      <image32x32>assets/icons/gn-32.png</image32x32>
+      <image48x48>assets/icons/gn-48.png</image48x48>
+      <image128x128>assets/icons/gn-128.png</image128x128>
+    </icon> -->
+
+  <!-- Whether the application handles the update when a user double-clicks an update version
+  of the AIR file (true), or the default AIR application installer handles the update (false).
+  Optional. Default false. -->
+  <!-- <customUpdateUI></customUpdateUI> -->
+  
+  <!-- Whether the application can be launched when the user clicks a link in a web browser.
+  Optional. Default false. -->
+  <!-- <allowBrowserInvocation>true</allowBrowserInvocation> -->
+
+  <!-- Listing of file types for which the application can register. Optional. -->
+  <fileTypes>
+
+    <!-- Defines one file type. Optional. -->
+  </fileTypes>
+
+</application>

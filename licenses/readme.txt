@@ -44,9 +44,7 @@ Differences:
 
 Known Issues:
 
-  1) Need good testing framework to put it through it's paces.
-  
-  2) Not tested in Internet Exploder. Known to work in Safari 3.1+ and FireFox 3+.
+  2) Not tested in Internet Exploder. Known to work in Safari 3.1+, FireFox 3+, and Adobe Air 1.1+.
 
 References:
   - http://wiki.shopify.com/UsingLiquid
