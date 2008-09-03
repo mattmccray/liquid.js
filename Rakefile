@@ -8,15 +8,15 @@ end
 desc "Test javascript in Rhino... Requires Java"
 task :test do
   # Yeah, doesn't really work right yet
-  #puts `java -jar test/env/js.jar test/env/test.harness.js`
-  puts "Not working yet. But you can open test/liquid-tests.html in your browser..."
+  puts `java -jar test/env/js.jar test/env/test.harness.js`
+  #puts "Not working yet. But you can open test/liquid-tests.html in your browser..."
 end
 
 
 desc "Compiles from source scripts into dist/liquid.js"
 task :build do
   source = {}
-  %w(api block condition context default_filters default_tags document drop strainer strftime tag template variable).each do |src|
+  %w(core block condition context default_filters default_tags document drop strainer strftime tag template variable).each do |src|
     source[ src.to_sym ] = IO.readlines("source/#{ src }.js")
   end
   license = {}
@@ -26,32 +26,30 @@ task :build do
   template =<<-EOS
 #{ license[:liquid] }
 #{ license[:readme] }
-var Liquid = (function(){
-  // tag.js
-  #{ source[:tag] }
-  // block.js
-  #{ source[:block] }
-  // document.js  
-  #{ source[:document] }
-  // strainer.js
-  #{ source[:strainer] }
-  // context.js  
-  #{ source[:context] }
-  // template.js
-  #{ source[:template] }
-  // variable.js
-  #{ source[:variable] }
-  // condition.js
-  #{ source[:condition] }
-  // drop.js
-  #{ source[:drop] }
-  // default_tags.js
-  #{ source[:default_tags] }
-  // default_filters.js
-  #{ source[:default_filters] }
-  // api.js
-  #{ source[:api] }
-})();
+// core.js
+#{ source[:core] }
+// tag.js
+#{ source[:tag] }
+// block.js
+#{ source[:block] }
+// document.js  
+#{ source[:document] }
+// strainer.js
+#{ source[:strainer] }
+// context.js  
+#{ source[:context] }
+// template.js
+#{ source[:template] }
+// variable.js
+#{ source[:variable] }
+// condition.js
+#{ source[:condition] }
+// drop.js
+#{ source[:drop] }
+// default_tags.js
+#{ source[:default_tags] }
+// default_filters.js
+#{ source[:default_filters] }
 
 // strftime.js
 #{ license[:strftime] }

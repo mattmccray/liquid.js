@@ -1,14 +1,12 @@
-var SquareBracketed = /^\[(.*)\]$/;
-var VariableParser  = /\[[^\]]+\]|(?:[\w\-]\??)+/g;
 
-var Context = new Class({
+Liquid.Context = new Class({
 
   initialize: function(assigns, registers, rethrowErrors) {
     this.scopes = [ $H(assigns || {}) ];
     this.registers = registers || {};
     this.errors = [];
     this.rethrowErrors = rethrowErrors;
-    this.strainer = Strainer.create(this);
+    this.strainer = Liquid.Strainer.create(this);
   },
   
   get: function(varname) {
@@ -126,9 +124,9 @@ var Context = new Class({
   
   variable: function(markup) {
     //return this.scopes[0][key] || ''
-    var parts       = markup.match( VariableParser ),
+    var parts       = markup.match( /\[[^\]]+\]|(?:[\w\-]\??)+/g ),
         firstPart   = parts.shift(),
-        squareMatch = firstPart.match(SquareBracketed);
+        squareMatch = firstPart.match(/^\[(.*)\]$/);
 
     if(squareMatch)
       { firstPart = this.resolve( squareMatch[1] ); }
@@ -140,7 +138,7 @@ var Context = new Class({
     if(object) {
       parts.each(function(part){
         // If object is a hash we look for the presence of the key and if its available we return it
-        var squareMatch = part.match(SquareBracketed);
+        var squareMatch = part.match(/^\[(.*)\]$/);
         if(squareMatch) {
           var part = self.resolve(squareMatch[1]);
           // Where the hell does 'pos' come from?

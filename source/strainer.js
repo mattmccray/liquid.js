@@ -1,4 +1,4 @@
-var Strainer = new Class({
+Liquid.Strainer = new Class({
 
   initialize: function(context) {
     this.context = context;
@@ -10,23 +10,23 @@ var Strainer = new Class({
   }
 });
 
-Strainer.filters = $H({});
+Liquid.Strainer.filters = $H({});
 
-Strainer.globalFilter = function(filters) {
+Liquid.Strainer.globalFilter = function(filters) {
   
-  Strainer.filters.extend(filters);
+  Liquid.Strainer.filters.extend(filters);
 }
 
 // Array of methods to keep...
-Strainer.requiredMethods = $A(['respondTo', 'context']); 
+Liquid.Strainer.requiredMethods = $A(['respondTo', 'context']); 
 
-Strainer.create = function(context) {
+Liquid.Strainer.create = function(context) {
    // Not sure all this really matters for JS... Maybe?
-  Strainer.implement( Strainer.filters );
-  var strainer = new Strainer(context);
+  Liquid.Strainer.implement( Liquid.Strainer.filters );
+  var strainer = new Liquid.Strainer(context);
 //    strainer.__proto__ = {};
   for(key in strainer) {
-    if(!Strainer.filters.getKeys().contains(key) || !Strainer.requiredMethods.contains(key)) {
+    if(!Liquid.Strainer.filters.getKeys().contains(key) || !Liquid.Strainer.requiredMethods.contains(key)) {
       delete strainer[key];
     }
   }

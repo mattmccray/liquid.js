@@ -1,6 +1,4 @@
-var TemplateParser = /(\{\%.*?\%\}|\{\{.*?\}\}?)/;
-
-var Template = new Class({
+Liquid.Template = new Class({
 
   initialize: function() {
     this.root = null;
@@ -12,7 +10,7 @@ var Template = new Class({
   },
 
   parse: function(src) {
-    this.root = new Document( Template.tokenize(src) );
+    this.root = new Liquid.Document( Liquid.Template.tokenize(src) );
     return this;
   },
 
@@ -21,14 +19,14 @@ var Template = new Class({
     var args = $A(arguments).associate(['ctx', 'filters', 'registers']);
     var context = null;
     
-    if(args.ctx instanceof Context ) {
+    if(args.ctx instanceof Liquid.Context ) {
       context = args.ctx;
       this.assigns = context.assigns;
       this.registers = context.registers;
     } else {
       if(args.ctx){ this.assigns.extend(args.ctx); }
       if(args.registers){ this.registers.extend(args.registers); }
-      context = new Context(this.assigns, this.registers, this.rethrowErrors)
+      context = new Liquid.Context(this.assigns, this.registers, this.rethrowErrors)
     }
     
     if(args.filters){ context.addFilters(arg.filters); }
@@ -47,20 +45,19 @@ var Template = new Class({
   }
 });
 
-Template.fileSystem = {};
 
-Template.tags = {};
+Liquid.Template.tags = {};
 
-Template.registerTag = function(name, klass) {
-  Template.tags[ name ] = klass;
+Liquid.Template.registerTag = function(name, klass) {
+  Liquid.Template.tags[ name ] = klass;
 }
 
-Template.registerFilter = function(filters) {
-  Strainer.globalFilter(filters)
+Liquid.Template.registerFilter = function(filters) {
+  Liquid.Strainer.globalFilter(filters)
 }
 
-Template.tokenize = function(src) {
-  var tokens = src.split( TemplateParser );
+Liquid.Template.tokenize = function(src) {
+  var tokens = src.split( /(\{\%.*?\%\}|\{\{.*?\}\}?)/ );
   // removes the rogue empty element at the beginning of the array
   if(tokens[0] == ''){ tokens.shift(); }
 //  console.log("Source tokens:", tokens)
@@ -68,6 +65,6 @@ Template.tokenize = function(src) {
 }
 
 
-Template.parse =  function(src) {
-  return (new Template()).parse(src);
+Liquid.Template.parse =  function(src) {
+  return (new Liquid.Template()).parse(src);
 }

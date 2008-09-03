@@ -1,5 +1,5 @@
-var Block = new Class({
-  Extends: Tag,
+Liquid.Block = new Class({
+  Extends: Liquid.Tag,
   
   initialize: function(tagName, markup, tokens){
     this.blockName = tagName;
@@ -23,8 +23,8 @@ var Block = new Class({
             this.endTag();
             return;
           }
-          if( tagParts[1] in Template.tags ) {
-            this.nodelist.push( new Template.tags[tagParts[1]]( tagParts[1], tagParts[2], tokens ) );
+          if( tagParts[1] in Liquid.Template.tags ) {
+            this.nodelist.push( new Liquid.Template.tags[tagParts[1]]( tagParts[1], tagParts[2], tokens ) );
           } else {
             this.unknownTag( tagParts[1], tagParts[2], tokens );
           }
@@ -55,7 +55,7 @@ var Block = new Class({
   
   createVariable: function(token) {
     var match = token.match(/^\{\{(.*)\}\}$/);
-    if(match) { return new Variable(match[1]); }
+    if(match) { return new Liquid.Variable(match[1]); }
     else { throw ("Variable '"+ token +"' was not properly terminated with: }}"); }
   },
   

@@ -1,6 +1,6 @@
-var Document = new Class({
+Liquid.Document = new Class({
 
-  Extends: Block,
+  Extends: Liquid.Block,
 
   initialize: function(tokens){
     this.blockDelimiter = []; // [], really?

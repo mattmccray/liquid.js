@@ -1,4 +1,4 @@
-var Drop = new Class({
+Liquid.Drop = new Class({
   setContext: function(context) {
     this.context = context;
   },

@@ -1,4 +1,5 @@
-var Condition = new Class({
+Liquid.Condition = new Class({
+
   initialize: function(left, operator, right) {
     this.left = left;
     this.operator = operator;
@@ -9,7 +10,7 @@ var Condition = new Class({
   },
   
   evaluate: function(context) {
-    context = context || new Context();
+    context = context || new Liquid.Context();
     var result = this.interpretCondition(this.left, this.right, this.operator, context);
     switch(this.childRelation) {
       case 'or':
@@ -47,7 +48,7 @@ var Condition = new Class({
     
     left = context.get(left);
     right = context.get(right);
-    op = Condition.operators[op];
+    op = Liquid.Condition.operators[op];
     if(!op)
       { throw ("Unknown operator "+ op); }
     
@@ -61,7 +62,7 @@ var Condition = new Class({
   
 });
   
-Condition.operators = {
+Liquid.Condition.operators = {
   '==': function(l,r) {  return (l == r); },
   '=':  function(l,r) { return (l == r); },
   '!=': function(l,r) { return (l != r); },
@@ -76,8 +77,9 @@ Condition.operators = {
   'hasValue': function(l,r) { return $H(l).getValue(r); }
 }
 
-var ElseCondition = new Class({
-  Extends: Condition,
+Liquid.ElseCondition = new Class({
+
+  Extends: Liquid.Condition,
   
   isElse: true,
   

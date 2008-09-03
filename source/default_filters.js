@@ -1,5 +1,5 @@
 // Standard Filters
-Template.registerFilter({
+Liquid.Template.registerFilter({
   
   size: function(iterable) {
     return (iterable['length']) ? iterable.length : 0;

@@ -1,4 +1,4 @@
-var Variable = new Class({
+Liquid.Variable = new Class({
   initialize: function(markup) {
     this.markup = markup;
     this.name = null;
