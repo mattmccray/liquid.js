@@ -1003,7 +1003,6 @@ Liquid.Template.registerTag( 'if', new Class({
         }
       };
     })
-    return output;
     return $splat(output).join('');
   },
   
@@ -1103,7 +1102,6 @@ Liquid.Template.registerTag( 'include', new Class({
       }
     });
     output = $splat(output).join('');
-    alert(output)
     return output
   }
 }));
