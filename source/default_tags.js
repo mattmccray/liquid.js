@@ -325,6 +325,7 @@ Liquid.Template.registerTag( 'if', new Class({
       };
     })
     return output;
+    return $splat(output).join('');
   },
   
   pushBlock: function(tag, markup) {
@@ -422,7 +423,9 @@ Liquid.Template.registerTag( 'include', new Class({
         output = partial.render(context);
       }
     });
-    return $splat(output).join('');
+    output = $splat(output).join('');
+    alert(output)
+    return output
   }
 }));
 
