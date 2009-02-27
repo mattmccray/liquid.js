@@ -17,6 +17,10 @@ var Tests = (function() {
       assertDefined( typeof Liquid.Tag,       "Liquid.Tag is missing" );
       assertDefined( typeof Liquid.Block,     "Liquid.Tag is missing" );
     },
+    
+    "Plain text pass-thru": function() {
+      assertEqual( 'plain text', render('plain text')  )
+    },
 
     note1: "Testing variables...",
 
@@ -42,6 +46,9 @@ var Tests = (function() {
     "{{ (1..5) }}": function() {
       assertEqual( '1,2,3,4,5', render('{{(1..5)}}')  )
       assertEqual( '1,2,3,4,5', render('{{ (1..5) }}')  )
+    },
+    "{{ (a..e) }}": function() {
+      assertEqual( 'a,b,c,d,e', render('{{(a..e)}}')  )
     },
     
     '{{ varname }}': function() {
@@ -185,10 +192,10 @@ var Tests = (function() {
     },
 
     "{{ collection | sort }}": function() {
-      assertEqual( "1,2,3", render("{{(3..1)|sort}}") );
-      assertEqual( "1,2,3", render("{{ (3..1) | sort }}") );
       assertEqual( "1,2,3", render("{{c|sort}}", {c:[2,1,3]}) );
       assertEqual( "1,2,3", render("{{ c | sort }}", {c:[2,1,3]}) );
+      assertEqual( "1,2,3", render("{{(1..3)|sort}}") );
+      assertEqual( "1,2,3", render("{{ (1..3) | sort }}") );
     },
 
     "{{ collection | reverse }}": function() {
@@ -290,6 +297,7 @@ var Tests = (function() {
       assertEqual(" Two!", tmpl.render({ testVar:2 }));
       assertEqual(" Test!", tmpl.render({ testVar:'test' }));
       assertEqual(" Got me", tmpl.render({ testVar:null }));
+      assertEqual(" Got me", tmpl.render({ }));
     },
     
     "{% comment %} content {% endcomment %}": function() {

@@ -1,7 +1,7 @@
 /* Copyright (c) 2005, 2006 Tobias Luetke,
 
    JavaScript port by M@ McCray (http://www.mattmccray.com)
-   Requires Mootools 1.2
+   Requires Prototype 1.6+
    
    http://github.com/darthapo/liquid.js/wikis
 

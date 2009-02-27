@@ -1,5 +1,5 @@
 
-Liquid.Context = new Class({
+Liquid.Context = Class.create({
 
   initialize: function(assigns, registers, rethrowErrors) {
     this.scopes = [ $H(assigns || {}) ];
@@ -14,7 +14,7 @@ Liquid.Context = new Class({
   },
   
   set: function(varname, value) {
-    this.scopes[0][varname] = value;
+    this.scopes[0].set(varname, value);
   },
   
   hasKey: function(key) {
@@ -28,7 +28,7 @@ Liquid.Context = new Class({
   },
   
   merge: function(newScope) {
-    return this.scopes[0].extend(newScope);
+    return this.scopes[0].update(newScope);
   },
   
   pop: function() {
@@ -49,9 +49,14 @@ Liquid.Context = new Class({
   
   invoke: function(method, args) {
     if( this.strainer.respondTo(method) ) {
-      return this.strainer[method].run(args, this.strainer);
+      // console.log('found method '+ method)
+      // console.log("INVOKE: "+ method)
+      // console.log(Object.inspect(args))
+      var result = this.strainer[method].apply(this.strainer, args);
+      // console.log("result: "+ Object.inspect(result));
+      return result;
     } else {
-      return $pick(args);
+      return $A(args).first(); // was: $pick
     }
   },
   
@@ -75,55 +80,65 @@ Liquid.Context = new Class({
         return '';
       
       default:
-        if(key.test(/^'(.*)'$/))      // Single quoted strings
+        if((/^'(.*)'$/).test(key))      // Single quoted strings
           { return key.replace(/^'(.*)'$/, '$1'); }
-        else if(key.test(/^"(.*)"$/)) // Double quoted strings
+          
+        else if((/^"(.*)"$/).test(key)) // Double quoted strings
           { return key.replace(/^"(.*)"$/, '$1'); }
-        else if(key.test(/^(\d+)$/ )) // Integer...
+          
+        else if((/^(\d+)$/).test(key)) // Integer...
           { return parseInt( key.replace(/^(\d+)$/ , '$1') ); }
-        else if(key.test(/^(\d[\d\.]+)$/)) // Float...
+          
+        else if((/^(\d[\d\.]+)$/).test(key)) // Float...
           { return parseFloat( key.replace(/^(\d[\d\.]+)$/, '$1') ); }
-        else if(key.test(/^\((\S+)\.\.(\S+)\)$/)) {// Ranges 
+          
+        else if((/^\((\S+)\.\.(\S+)\)$/).test(key)) {// Ranges 
           // FIXME: This assumes number ranges... Add support for character ranges too...
           // JavaScript doesn't have native support for those, so I turn 'em into an array of integers...
           var range = key.match(/^\((\S+)\.\.(\S+)\)$/),
-              arr   = $A([]),
               left  = range[1],
               right = range[2];
-          if(left > right) { // Counting down...
-            for( var i = left; i >= right; i--) {
-              arr.push(i);
-            };
-          } else { // Counting up...
-            for( var i = left; i <= right; i++) {
-              arr.push(i);
-            };
-          }
+              arr   = $R(left, right).toArray();
           return arr;
+     
         } else {
-          return this.variable(key); }
+          var result = this.variable(key);
+          // console.log("Finding variable: "+ key)
+          // console.log(Object.inspect(result))
+          return result; 
+        }
     }
   },
   
   findVariable: function(key) {
     for (var i=0; i < this.scopes.length; i++) {
       var scope = this.scopes[i];
-      if( scope && (key in scope) ) {
-        var variable = scope[key];
-        if($type(variable) == 'function')
-          { variable = scope[key] = variable.apply(this); }
-        if($type(variable) == 'object' && ('toLiquid' in variable))
-          { variable = variable.toLiquid(); }
-        if($type(variable) == 'object' && ('setContext' in variable))
-          { variable.setContext(self); }
+      if( scope && scope.keys().include(key) ) {
+        var variable = scope.get(key);
+        if(typeof(variable) == 'function'){
+          variable = variable.apply(this); 
+          scope.set(key, variable);
+        }
+        if(variable && typeof(variable) == 'object' && ('toLiquid' in variable)) {
+          variable = variable.toLiquid(); 
+        }
+        if(variable && typeof(variable) == 'object' && ('setContext' in variable)){
+          variable.setContext(self);
+        }
         return variable;
       }
     };
+//    console.log('findVariable("'+ key +'") is returning NULL')
     return null;
   },
   
   variable: function(markup) {
     //return this.scopes[0][key] || ''
+    if(typeof markup != 'string') {
+    //  console.log('markup('+ Object.inspect(markup) +') was unexpected, returning NULL')
+      return null;
+    }
+      
     var parts       = markup.match( /\[[^\]]+\]|(?:[\w\-]\??)+/g ),
         firstPart   = parts.shift(),
         squareMatch = firstPart.match(/^\[(.*)\]$/);
@@ -140,30 +155,30 @@ Liquid.Context = new Class({
         // If object is a hash we look for the presence of the key and if its available we return it
         var squareMatch = part.match(/^\[(.*)\]$/);
         if(squareMatch) {
-          var part = self.resolve(squareMatch[1]);
+          var part = self.resolve( squareMatch[1] );
           // Where the hell does 'pos' come from?
-          if( $type(object[part]) == 'function'){ object[pos] = object[part].apply(this); }// Array?
+          if( typeof(object[part]) == 'function'){ object[part] = object[part].apply(this); }// Array?
           object = object[part];
-          if($type(object) == 'object' && ('toLiquid' in object)){ object = object.toLiquid(); }
+          if(typeof(object) == 'object' && ('toLiquid' in object)){ object = object.toLiquid(); }
         } else {
           // Hash
-          if( ($type(object) == 'object' || $type(object) == 'hash') && (part in object)) {
+          if( (typeof(object) == 'object' || typeof(object) == 'hash') && (part in object)) {
             // if its a proc we will replace the entry in the hash table with the proc
             res = object[part];
-            if( $type(res) == 'function'){ res = object[part] = res.apply(self) ; }
-            if( $type(res) == 'object' && ('toLiquid' in res)){ object = res.toLiquid(); }
+            if( typeof(res) == 'function'){ res = object[part] = res.apply(self) ; }
+            if( typeof(res) == 'object' && ('toLiquid' in res)){ object = res.toLiquid(); }
             else { object = res; }
           }
           // Array
           else if( (/^\d+$/).test(part) ) {
             pos = parseInt(part);
-            if( $type(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
-            if($type(object[pos]) == 'object' && $type(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
+            if( typeof(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
+            if(typeof(object[pos]) == 'object' && typeof(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
             else { object  = object[pos]; }
           }
           // Some special cases. If no key with the same name was found we interpret following calls
           // as commands and call them on the current object
-          else if( $type(object[part]) == 'function' && ['length', 'size', 'first', 'last'].contains(part) ) {
+          else if( typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
             object = object[part].apply(part);
             if('toLiquid' in object){ object = object.toLiquid(); }
           }
@@ -172,7 +187,7 @@ Liquid.Context = new Class({
           else {
             return null;
           }
-          if($type(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
+          if(typeof(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
         }
       });
     }
@@ -180,10 +195,10 @@ Liquid.Context = new Class({
   },
   
   addFilters: function(filters) {
-    filters = $splat(filters).flatten();
+    filters = filters.flatten();
     filters.each(function(f){
-      if($type(f) != 'object'){ throw ("Expected object but got: "+ $type(f)) }
-      this.strainer.implement(f);
+      if(typeof(f) != 'object'){ throw ("Expected object but got: "+ typeof(f)) }
+      this.strainer.addMethods(f);
     });
   },
   

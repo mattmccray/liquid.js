@@ -8,59 +8,41 @@ end
 desc "Test javascript in Rhino... Requires Java"
 task :test do
   # Yeah, doesn't really work right yet
+  puts "Not working yet. But you can open test/liquid-tests.html in your browser..."
   puts `java -jar test/env/js.jar test/env/test.harness.js`
-  #puts "Not working yet. But you can open test/liquid-tests.html in your browser..."
 end
+
 
 
 desc "Compiles from source scripts into dist/liquid.js"
 task :build do
-  source = {}
-  %w(core block condition context default_filters default_tags document drop strainer strftime tag template variable).each do |src|
-    source[ src.to_sym ] = IO.readlines("source/#{ src }.js")
+  puts "Building liquid.js..."
+  begin
+    require 'sprockets'
+  rescue
+    puts "Build require sprockets:"
+    puts
+    puts "  gem install sprockets"
+    puts
+    exit(1)
   end
-  license = {}
-  %w(liquid strftime readme).each do |src|
-    license[ src.to_sym ] = IO.readlines("licenses/#{ src }.txt")
-  end
-  template =<<-EOS
-#{ license[:liquid] }
-#{ license[:readme] }
-// core.js
-#{ source[:core] }
-// tag.js
-#{ source[:tag] }
-// block.js
-#{ source[:block] }
-// document.js  
-#{ source[:document] }
-// strainer.js
-#{ source[:strainer] }
-// context.js  
-#{ source[:context] }
-// template.js
-#{ source[:template] }
-// variable.js
-#{ source[:variable] }
-// condition.js
-#{ source[:condition] }
-// drop.js
-#{ source[:drop] }
-// default_tags.js
-#{ source[:default_tags] }
-// default_filters.js
-#{ source[:default_filters] }
+  
+  secretary = Sprockets::Secretary.new(
+    :asset_root   => "assets",
+    :load_path    => ["source", "etc", "."],
+    :source_files => ["source/core.js"]
+  )
 
-// strftime.js
-#{ license[:strftime] }
-#{ source[:strftime] }
-EOS
-  File.open("dist/liquid.js", 'w') do |f|
-    f.write template
-  end
+  # Generate a Sprockets::Concatenation object from the source files
+  concatenation = secretary.concatenation
+  # Write the concatenation to disk
+  concatenation.save_to("dist/liquid.js")
   
   puts "Piping liquid.js through jsmin..."
   `cat dist/liquid.js | jsmin > dist/liquid.min.js`
+
+  puts "Piping liquid.js through yuicompressor..."
+  `java -jar $HOME/Dev/bin/yuicompressor-2.3.5.jar -o dist/liquid.ymin.js dist/liquid.js`
   
-  puts "Done."
+  puts 'Done.'
 end

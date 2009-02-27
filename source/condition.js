@@ -1,4 +1,4 @@
-Liquid.Condition = new Class({
+Liquid.Condition = Class.create({
 
   initialize: function(left, operator, right) {
     this.left = left;
@@ -72,15 +72,13 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return l.contains(r); },
-  'hasKey':   function(l,r) { return $H(l).getKeys().contains(r); },
-  'hasValue': function(l,r) { return $H(l).getValue(r); }
+  'contains': function(l,r) { return $A(l).include(r); },
+  'hasKey':   function(l,r) { return $H(l).keys().include(r); },
+  'hasValue': function(l,r) { return $H(l).get(r); }
 }
 
-Liquid.ElseCondition = new Class({
+Liquid.ElseCondition = Class.create(Liquid.Condition, {
 
-  Extends: Liquid.Condition,
-  
   isElse: true,
   
   evaluate: function(context) {

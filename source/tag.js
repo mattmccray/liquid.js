@@ -1,4 +1,5 @@
-Liquid.Tag = new Class({
+Liquid.Tag = Class.create({
+
   initialize: function(tagName, markup, tokens) {
     this.tagName = tagName;
     this.markup = markup;

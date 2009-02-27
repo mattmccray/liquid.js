@@ -2,7 +2,7 @@
 load('test/env/dom.js');
 
 // Liquid dependencies
-load('etc/mootools-1.2-core.js');
+load('etc/prototype.js');
 
 // Flippin' strftime needs this:
 var document = {

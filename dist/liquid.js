@@ -1,146 +1,58 @@
-/* Copyright (c) 2005, 2006 Tobias Luetke,
-
-   JavaScript port by M@ McCray (http://www.mattmccray.com)
-   Requires Mootools 1.2
-   
-   http://github.com/darthapo/liquid.js/wikis
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-*/
-/*
-
-General:
-
-  This is a complete port of Liquid from Ruby to JavaScript. Any template
-  that Ruby Liquid can compile and render, Liquid JS should too.
-
-Differences:
-
-  1) Ranges. JavaScript doesn't really have Ranges like Ruby does. So when
-     Liquid JS comes across a range "(1..5)", it creates an Array with the
-     values 1 through 5. WARNING: It does assume numeric ranges, so (A..Z)
-     won't work.
-
-  2) 'replace' and 'replace_first' filters actually build RegExps from the
-     input, so you can actually define a regexp to use in your replacement.
-
-  3) 'include' tag. By default, this will return a Liquid error (but not
-     an exception). You use the 'include' tag, you'll need to implement your
-     own 'filesystem' support. Which, in Liquid JS, just means you override
-     the Liquid.readTemplateFile function to suit your own needs. Here's an
-     example:
-     
-        <script>
-          
-          Liquid.readTemplateFile = function(path) {
-            var elem = $(path);
-            if(elem) {
-              return elem.innerHTML;
-            } else {
-              path +" can't be found."; // Or throw and error, or whatever you want...
-            }
-          }
-          
-          var tmpl = Liquid.parse("{% include 'myOtherTemplate' with current_user %}");
-          
-          alert( tmpl.render({ current_user:'M@' }));
-          
-        </script>
-        
-        <script type="text/liquid" id="myOtherTemplate">
-          Hello, {{ current_user }}!
-        </script>
-
-Known Issues:
-
-  2) Not tested in Internet Exploder. Known to work in Safari 3.1+, FireFox 3+, and Adobe Air 1.1+.
-
-References:
-  - http://wiki.shopify.com/UsingLiquid
-
-*/
-// core.js
 var Liquid = {
 
-  version: {
-    major: 1,
-    minor: 1,
-    build: 1,
-    toString: function(){ return [this.major, this.minor, this.build].join('.'); }
-  },
+  author: 'M@ McCray <darthapo@gmail.com>',
+  version: '1.2',
 
   readTemplateFile: function(path) {
     throw ("This liquid context does not allow includes.");
   },
-  
+
   registerFilters: function(filters) {
     Liquid.Template.registerFilter(filters);
   },
-  
+
   parse: function(src) {
     return Liquid.Template.parse(src);
   }
-  
+
 }
-// tag.js
-Liquid.Tag = new Class({
+
+Liquid.Tag = Class.create({
+
   initialize: function(tagName, markup, tokens) {
     this.tagName = tagName;
     this.markup = markup;
     this.nodelist = this.nodelist || [];
     this.parse(tokens);
   },
-  
+
   parse: function(tokens) {
-//      console.log("Tag.parse not implemented...");
   },
-  
+
   render: function(context) {
     return '';
   }
-  
-  // From ruby: def name; self.class.name.downcase; end
+
 });
-// block.js
-Liquid.Block = new Class({
-  Extends: Liquid.Tag,
-  
-  initialize: function(tagName, markup, tokens){
+Liquid.Block = Class.create(Liquid.Tag, {
+
+  initialize: function($super, tagName, markup, tokens){
     this.blockName = tagName;
     this.blockDelimiter = "end"+ this.blockName;
-    this.parent(tagName, markup, tokens);
+    $super(tagName, markup, tokens);
   },
-  
+
   parse: function(tokens) {
     this.nodelist = this.nodelist || [];
-    $A(this.nodelist).empty();
+    $A(this.nodelist).clear();
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...
-    while(tokens.length) { 
+    while(tokens.length) {
 
       if( /^\{\%/.test(token) ) { // It's a tag...
         var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
-        
+
         if(tagParts) {
-          // if we found the proper block delimitor just end parsing here and let the outer block proceed
           if( this.blockDelimiter == tagParts[1] ) {
             this.endTag();
             return;
@@ -160,13 +72,12 @@ Liquid.Block = new Class({
       } // Ignores tokens that are empty
       token = tokens.shift(); // Assign the next token to loop again...
     }
-    
-    // Effectively this method will throw and exception unless the current block is of type Document 
+
     this.assertMissingDelimitation();
   },
-  
+
   endTag: function() {},
-  
+
   unknownTag: function(tag, params, tokens) {
     switch(tag) {
       case 'else': throw (this.blockName +" tag does not expect else tag"); break;
@@ -174,17 +85,17 @@ Liquid.Block = new Class({
       default:     throw ("Unknown tag: "+ tag);
     }
   },
-  
+
   createVariable: function(token) {
     var match = token.match(/^\{\{(.*)\}\}$/);
     if(match) { return new Liquid.Variable(match[1]); }
     else { throw ("Variable '"+ token +"' was not properly terminated with: }}"); }
   },
-  
+
   render: function(context) {
     return this.renderAll(this.nodelist, context);
   },
-  
+
   renderAll: function(list, context) {
     return $A(list || []).map(function(token, i){
       var output = '';
@@ -196,15 +107,12 @@ Liquid.Block = new Class({
       return output;
     });
   },
-  
+
   assertMissingDelimitation: function(){
     throw (this.blockName +" tag was never closed");
   }
 });
-// document.js  
-Liquid.Document = new Class({
-
-  Extends: Liquid.Block,
+Liquid.Document = Class.create( Liquid.Block, {
 
   initialize: function(tokens){
     this.blockDelimiter = []; // [], really?
@@ -212,18 +120,15 @@ Liquid.Document = new Class({
   },
 
   assertMissingDelimitation: function() {
-    // Documents don't need to assert this...
   }
 });
-// strainer.js
-Liquid.Strainer = new Class({
+Liquid.Strainer = Class.create({
 
   initialize: function(context) {
     this.context = context;
   },
-  
+
   respondTo: function(methodName) {
-//      if( /^__/.test(methodName)) return false;
     return (methodName in this);
   }
 });
@@ -231,28 +136,18 @@ Liquid.Strainer = new Class({
 Liquid.Strainer.filters = $H({});
 
 Liquid.Strainer.globalFilter = function(filters) {
-  
-  Liquid.Strainer.filters.extend(filters);
+  Liquid.Strainer.filters.update(filters);
+  Liquid.Strainer.addMethods( filters );
 }
 
-// Array of methods to keep...
-Liquid.Strainer.requiredMethods = $A(['respondTo', 'context']); 
+Liquid.Strainer.requiredMethods = $A(['respondTo', 'context']);
 
 Liquid.Strainer.create = function(context) {
-   // Not sure all this really matters for JS... Maybe?
-  Liquid.Strainer.implement( Liquid.Strainer.filters );
   var strainer = new Liquid.Strainer(context);
-//    strainer.__proto__ = {};
-  for(key in strainer) {
-    if(!Liquid.Strainer.filters.getKeys().contains(key) || !Liquid.Strainer.requiredMethods.contains(key)) {
-      delete strainer[key];
-    }
-  }
   return strainer;
 }
-// context.js  
 
-Liquid.Context = new Class({
+Liquid.Context = Class.create({
 
   initialize: function(assigns, registers, rethrowErrors) {
     this.scopes = [ $H(assigns || {}) ];
@@ -261,34 +156,34 @@ Liquid.Context = new Class({
     this.rethrowErrors = rethrowErrors;
     this.strainer = Liquid.Strainer.create(this);
   },
-  
+
   get: function(varname) {
     return this.resolve(varname);
   },
-  
+
   set: function(varname, value) {
-    this.scopes[0][varname] = value;
+    this.scopes[0].set(varname, value);
   },
-  
+
   hasKey: function(key) {
     return (this.resolve(key)) ? true : false;
   },
-  
+
   push: function() {
     var scpObj = $H({});
     this.scopes.unshift(scpObj);
     return scpObj // Is this right?
   },
-  
+
   merge: function(newScope) {
-    return this.scopes[0].extend(newScope);
+    return this.scopes[0].update(newScope);
   },
-  
+
   pop: function() {
     if(this.scopes.length == 1){ throw "Context stack error"; }
     return this.scopes.shift();
   },
-  
+
   stack: function(lambda, bind) {
     var result = null;
     this.push();
@@ -299,15 +194,16 @@ Liquid.Context = new Class({
     }
     return result;
   },
-  
+
   invoke: function(method, args) {
     if( this.strainer.respondTo(method) ) {
-      return this.strainer[method].run(args, this.strainer);
+      var result = this.strainer[method].apply(this.strainer, args);
+      return result;
     } else {
-      return $pick(args);
+      return $A(args).first(); // was: $pick
     }
   },
-  
+
   resolve: function(key) {
     switch(key) {
       case null:
@@ -315,131 +211,123 @@ Liquid.Context = new Class({
       case 'null':
       case '':
         return null;
-      
+
       case 'true':
         return true;
-        
+
       case 'false':
         return false;
-      
-      // Not sure what to do with (what would be) Symbols
+
       case 'blank':
       case 'empty':
         return '';
-      
+
       default:
-        if(key.test(/^'(.*)'$/))      // Single quoted strings
+        if((/^'(.*)'$/).test(key))      // Single quoted strings
           { return key.replace(/^'(.*)'$/, '$1'); }
-        else if(key.test(/^"(.*)"$/)) // Double quoted strings
+
+        else if((/^"(.*)"$/).test(key)) // Double quoted strings
           { return key.replace(/^"(.*)"$/, '$1'); }
-        else if(key.test(/^(\d+)$/ )) // Integer...
+
+        else if((/^(\d+)$/).test(key)) // Integer...
           { return parseInt( key.replace(/^(\d+)$/ , '$1') ); }
-        else if(key.test(/^(\d[\d\.]+)$/)) // Float...
+
+        else if((/^(\d[\d\.]+)$/).test(key)) // Float...
           { return parseFloat( key.replace(/^(\d[\d\.]+)$/, '$1') ); }
-        else if(key.test(/^\((\S+)\.\.(\S+)\)$/)) {// Ranges 
-          // FIXME: This assumes number ranges... Add support for character ranges too...
-          // JavaScript doesn't have native support for those, so I turn 'em into an array of integers...
+
+        else if((/^\((\S+)\.\.(\S+)\)$/).test(key)) {// Ranges
           var range = key.match(/^\((\S+)\.\.(\S+)\)$/),
-              arr   = $A([]),
               left  = range[1],
               right = range[2];
-          if(left > right) { // Counting down...
-            for( var i = left; i >= right; i--) {
-              arr.push(i);
-            };
-          } else { // Counting up...
-            for( var i = left; i <= right; i++) {
-              arr.push(i);
-            };
-          }
+              arr   = $R(left, right).toArray();
           return arr;
+
         } else {
-          return this.variable(key); }
+          var result = this.variable(key);
+          return result;
+        }
     }
   },
-  
+
   findVariable: function(key) {
     for (var i=0; i < this.scopes.length; i++) {
       var scope = this.scopes[i];
-      if( scope && (key in scope) ) {
-        var variable = scope[key];
-        if($type(variable) == 'function')
-          { variable = scope[key] = variable.apply(this); }
-        if($type(variable) == 'object' && ('toLiquid' in variable))
-          { variable = variable.toLiquid(); }
-        if($type(variable) == 'object' && ('setContext' in variable))
-          { variable.setContext(self); }
+      if( scope && scope.keys().include(key) ) {
+        var variable = scope.get(key);
+        if(typeof(variable) == 'function'){
+          variable = variable.apply(this);
+          scope.set(key, variable);
+        }
+        if(variable && typeof(variable) == 'object' && ('toLiquid' in variable)) {
+          variable = variable.toLiquid();
+        }
+        if(variable && typeof(variable) == 'object' && ('setContext' in variable)){
+          variable.setContext(self);
+        }
         return variable;
       }
     };
     return null;
   },
-  
+
   variable: function(markup) {
-    //return this.scopes[0][key] || ''
+    if(typeof markup != 'string') {
+      return null;
+    }
+
     var parts       = markup.match( /\[[^\]]+\]|(?:[\w\-]\??)+/g ),
         firstPart   = parts.shift(),
         squareMatch = firstPart.match(/^\[(.*)\]$/);
 
     if(squareMatch)
       { firstPart = this.resolve( squareMatch[1] ); }
-    
+
     var object = this.findVariable(firstPart),
         self = this;
 
-    // Does 'pos' need to be scoped up here?
     if(object) {
       parts.each(function(part){
-        // If object is a hash we look for the presence of the key and if its available we return it
         var squareMatch = part.match(/^\[(.*)\]$/);
         if(squareMatch) {
-          var part = self.resolve(squareMatch[1]);
-          // Where the hell does 'pos' come from?
-          if( $type(object[part]) == 'function'){ object[pos] = object[part].apply(this); }// Array?
+          var part = self.resolve( squareMatch[1] );
+          if( typeof(object[part]) == 'function'){ object[part] = object[part].apply(this); }// Array?
           object = object[part];
-          if($type(object) == 'object' && ('toLiquid' in object)){ object = object.toLiquid(); }
+          if(typeof(object) == 'object' && ('toLiquid' in object)){ object = object.toLiquid(); }
         } else {
-          // Hash
-          if( ($type(object) == 'object' || $type(object) == 'hash') && (part in object)) {
-            // if its a proc we will replace the entry in the hash table with the proc
+          if( (typeof(object) == 'object' || typeof(object) == 'hash') && (part in object)) {
             res = object[part];
-            if( $type(res) == 'function'){ res = object[part] = res.apply(self) ; }
-            if( $type(res) == 'object' && ('toLiquid' in res)){ object = res.toLiquid(); }
+            if( typeof(res) == 'function'){ res = object[part] = res.apply(self) ; }
+            if( typeof(res) == 'object' && ('toLiquid' in res)){ object = res.toLiquid(); }
             else { object = res; }
           }
-          // Array
           else if( (/^\d+$/).test(part) ) {
             pos = parseInt(part);
-            if( $type(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
-            if($type(object[pos]) == 'object' && $type(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
+            if( typeof(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
+            if(typeof(object[pos]) == 'object' && typeof(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
             else { object  = object[pos]; }
           }
-          // Some special cases. If no key with the same name was found we interpret following calls
-          // as commands and call them on the current object
-          else if( $type(object[part]) == 'function' && ['length', 'size', 'first', 'last'].contains(part) ) {
+          else if( typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
             object = object[part].apply(part);
             if('toLiquid' in object){ object = object.toLiquid(); }
           }
-          // No key was present with the desired value and it wasn't one of the directly supported
-          // keywords either. The only thing we got left is to return nil
           else {
             return null;
           }
-          if($type(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
+          if(typeof(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
         }
       });
     }
     return object;
   },
-  
+
   addFilters: function(filters) {
-    filters = $splat(filters).flatten();
+    filters = filters.flatten();
     filters.each(function(f){
-      if($type(f) != 'object'){ throw ("Expected object but got: "+ $type(f)) }
-      this.strainer.implement(f);
+      if(typeof(f) != 'object'){ throw ("Expected object but got: "+ typeof(f)) }
+      this.strainer.addMethods(f);
     });
   },
-  
+
   handleError: function(err) {
     this.errors.push(err);
     if(this.rethrowErrors){ throw err; }
@@ -447,8 +335,7 @@ Liquid.Context = new Class({
   }
 
 });
-// template.js
-Liquid.Template = new Class({
+Liquid.Template = Class.create({
 
   initialize: function() {
     this.root = null;
@@ -466,21 +353,25 @@ Liquid.Template = new Class({
 
   render: function() {
     if(!this.root){ return ''; }
-    var args = $A(arguments).associate(['ctx', 'filters', 'registers']);
+    var args = {
+      ctx: arguments[0],
+      filters: arguments[1],
+      registers: arguments[2]
+    }
     var context = null;
-    
+
     if(args.ctx instanceof Liquid.Context ) {
       context = args.ctx;
       this.assigns = context.assigns;
       this.registers = context.registers;
     } else {
-      if(args.ctx){ this.assigns.extend(args.ctx); }
-      if(args.registers){ this.registers.extend(args.registers); }
+      if(args.ctx){ this.assigns.update(args.ctx); }
+      if(args.registers){ this.registers.update(args.registers); }
       context = new Liquid.Context(this.assigns, this.registers, this.rethrowErrors)
     }
-    
+
     if(args.filters){ context.addFilters(arg.filters); }
-    
+
     try {
       return this.root.render(context).join('');
     } finally {
@@ -488,7 +379,7 @@ Liquid.Template = new Class({
       this.lastContext = context;
     }
   },
-  
+
   renderWithErrors: function() {
     this.renderWithErrors = true;
     return this.render.apply(this, arguments);
@@ -508,9 +399,7 @@ Liquid.Template.registerFilter = function(filters) {
 
 Liquid.Template.tokenize = function(src) {
   var tokens = src.split( /(\{\%.*?\%\}|\{\{.*?\}\}?)/ );
-  // removes the rogue empty element at the beginning of the array
   if(tokens[0] == ''){ tokens.shift(); }
-//  console.log("Source tokens:", tokens)
   return tokens;
 }
 
@@ -518,8 +407,8 @@ Liquid.Template.tokenize = function(src) {
 Liquid.Template.parse =  function(src) {
   return (new Liquid.Template()).parse(src);
 }
-// variable.js
-Liquid.Variable = new Class({
+Liquid.Variable = Class.create({
+
   initialize: function(markup) {
     this.markup = markup;
     this.name = null;
@@ -547,7 +436,7 @@ Liquid.Variable = new Class({
       }
     }
   },
-  
+
   render: function(context) {
     if(this.name == null){ return ''; }
     output = context.get(this.name);
@@ -563,8 +452,7 @@ Liquid.Variable = new Class({
     return output;
   }
 });
-// condition.js
-Liquid.Condition = new Class({
+Liquid.Condition = Class.create({
 
   initialize: function(left, operator, right) {
     this.left = left;
@@ -574,7 +462,7 @@ Liquid.Condition = new Class({
     this.childCondition = null;
     this.attachment = null;
   },
-  
+
   evaluate: function(context) {
     context = context || new Liquid.Context();
     var result = this.interpretCondition(this.left, this.right, this.operator, context);
@@ -587,47 +475,44 @@ Liquid.Condition = new Class({
         return result;
     }
   },
-  
+
   or: function(condition) {
     this.childRelation = 'or';
     this.childCondition = condition;
   },
-  
+
   and: function(condition) {
     this.childRelation = 'and';
     this.childCondition = condition;
   },
-  
+
   attach: function(attachment) {
     this.attachment = attachment;
     return this.attachment;
   },
-  
+
   isElse: false,
-  
+
   interpretCondition: function(left, right, op, context) {
-    // If the operator is empty this means that the decision statement is just 
-    // a single variable. We can just pull this variable from the context and 
-    // return this as the result.
     if(!op)
       { return context.get(left); }
-    
+
     left = context.get(left);
     right = context.get(right);
     op = Liquid.Condition.operators[op];
     if(!op)
       { throw ("Unknown operator "+ op); }
-    
+
     var results = op(left, right);
     return results;
   },
-  
+
   toString: function() {
     return "<Condition "+ this.left +" "+ this.operator +" "+ this.right +">";
   }
-  
+
 });
-  
+
 Liquid.Condition.operators = {
   '==': function(l,r) {  return (l == r); },
   '=':  function(l,r) { return (l == r); },
@@ -638,33 +523,30 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return l.contains(r); },
-  'hasKey':   function(l,r) { return $H(l).getKeys().contains(r); },
-  'hasValue': function(l,r) { return $H(l).getValue(r); }
+  'contains': function(l,r) { return $A(l).include(r); },
+  'hasKey':   function(l,r) { return $H(l).keys().include(r); },
+  'hasValue': function(l,r) { return $H(l).get(r); }
 }
 
-Liquid.ElseCondition = new Class({
+Liquid.ElseCondition = Class.create(Liquid.Condition, {
 
-  Extends: Liquid.Condition,
-  
   isElse: true,
-  
+
   evaluate: function(context) {
     return true;
   },
-  
+
   toString: function() {
     return "<ElseCondition>";
   }
-  
+
 });
-// drop.js
-Liquid.Drop = new Class({
+Liquid.Drop = Class.create({
   setContext: function(context) {
     this.context = context;
   },
   beforeMethod: function(method) {
-    
+
   },
   invokeDrop: function(method) {
     var results = this.beforeMethod();
@@ -676,15 +558,11 @@ Liquid.Drop = new Class({
     return true;
   }
 });
-// default_tags.js
-// Default Tags...
-Liquid.Template.registerTag( 'assign', new Class({
+Liquid.Template.registerTag( 'assign', Class.create(Liquid.Tag, {
 
   tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
-  
-  Extends: Liquid.Tag,
-  
-  initialize: function(tagName, markup, tokens) {
+
+  initialize: function($super, tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to   = parts[1];
@@ -692,79 +570,72 @@ Liquid.Template.registerTag( 'assign', new Class({
     } else {
       throw ("Syntax error in 'assign' - Valid syntax: assign [var] = [source]");
     }
-    this.parent(tagName, markup, tokens)
+    $super(tagName, markup, tokens)
   },
   render: function(context) {
-    context.scopes.getLast()[ this.to.toString() ] = context.get(this.from);
+    context.scopes.last().set( this.to.toString(), context.get(this.from));
     return '';
   }
 }));
 
-// Cache is just like capture, but it inserts into the root scope...
-Liquid.Template.registerTag( 'cache', new Class({
+Liquid.Template.registerTag( 'cache', Class.create( Liquid.Block, {
   tagSyntax: /(\w+)/,
-  
-  Extends: Liquid.Block,
-  
-  initialize: function(tagName, markup, tokens) {
+
+  initialize: function($super, tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to = parts[1];
     } else {
       throw ("Syntax error in 'cache' - Valid syntax: cache [var]");
     }
-    this.parent(tagName, markup, tokens);
+    $super(tagName, markup, tokens);
   },
-  render: function(context) {
-    var output = this.parent(context);
-    context.scopes.getLast()[this.to] = $splat(output).join('');
+  render: function($super, context) {
+    var output = $super(context);
+    context.scopes.last()[this.to] = [output].flatten().join('');
     return '';
   }
 }));
 
 
-Liquid.Template.registerTag( 'capture', new Class({
+Liquid.Template.registerTag( 'capture', Class.create(Liquid.Block, {
   tagSyntax: /(\w+)/,
-  
-  Extends: Liquid.Block,
-  
-  initialize: function(tagName, markup, tokens) {
+
+  initialize: function($super, tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to = parts[1];
     } else {
       throw ("Syntax error in 'capture' - Valid syntax: capture [var]");
     }
-    this.parent(tagName, markup, tokens);
+    $super(tagName, markup, tokens);
   },
-  render: function(context) {
-    var output = this.parent(context);
-    context.set( this.to, $splat(output).join('') );
+  render: function($super, context) {
+    var output = $super(context);
+    context.set( this.to, [output].flatten().join('') );
     return '';
   }
 }));
 
-Liquid.Template.registerTag( 'case', new Class({
+Liquid.Template.registerTag( 'case', Class.create(Liquid.Block, {
 
   tagSyntax     : /("[^"]+"|'[^']+'|[^\s,|]+)/,
   tagWhenSyntax : /("[^"]+"|'[^']+'|[^\s,|]+)(?:(?:\s+or\s+|\s*\,\s*)("[^"]+"|'[^']+'|[^\s,|]+.*))?/,
-  
-  Extends: Liquid.Block,
-  
-  initialize: function(tagName, markup, tokens) {
+
+  initialize: function($super, tagName, markup, tokens) {
     this.blocks = [];
     this.nodelist = [];
-    
+
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.left = parts[1];
     } else {
       throw ("Syntax error in 'case' - Valid syntax: case [condition]");
     }
-    
-    this.parent(tagName, markup, tokens);
+
+    $super(tagName, markup, tokens);
   },
-  unknownTag: function(tag, markup, tokens) {
+  unknownTag: function($super, tag, markup, tokens) {
     switch(tag) {
       case 'when':
         this.recordWhenCondition(markup);
@@ -773,9 +644,9 @@ Liquid.Template.registerTag( 'case', new Class({
         this.recordElseCondition(markup);
         break;
       default:
-        this.parent(tag, markup, tokens);
+        $super(tag, markup, tokens);
     }
-    
+
   },
   render: function(context) {
     var self = this,
@@ -786,15 +657,15 @@ Liquid.Template.registerTag( 'case', new Class({
       for (var i=0; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.isElse  ) {
-          if(execElseBlock == true){ output.extend(self.renderAll(block.attachment, context)); }
+          if(execElseBlock == true){ output = $A([output, self.renderAll(block.attachment, context)]).flatten(); }
           return output;
         } else if( block.evaluate(context) ) {
           execElseBlock = false;
-          output.extend( self.renderAll(block.attachment, context));
+          output = $A([output, self.renderAll(block.attachment, context)]).flatten();
         }
       };
     });
-    
+
     return output;
   },
   recordWhenCondition: function(markup) {
@@ -803,16 +674,16 @@ Liquid.Template.registerTag( 'case', new Class({
       if(!parts) {
         throw ("Syntax error in tag 'case' - Valid when condition: {% when [condition] [or condition2...] %} ");
       }
-      
+
       markup = parts[2];
-      
+
       var block = new Liquid.Condition(this.left, '==', parts[1]);
       this.blocks.push( block );
       this.nodelist = block.attach([]);
     }
   },
   recordElseCondition: function(markup) {
-    if( (markup || '').trim() != '') {
+    if( (markup || '').strip() != '') {
       throw ("Syntax error in tag 'case' - Valid else condition: {% else %} (no parameters) ")
     }
     var block = new Liquid.ElseCondition();
@@ -821,41 +692,35 @@ Liquid.Template.registerTag( 'case', new Class({
   }
 }));
 
-Liquid.Template.registerTag( 'comment', new Class({
-  Extends: Liquid.Block,
-  
+Liquid.Template.registerTag( 'comment', Class.create(Liquid.Block, {
   render: function(context) {
     return '';
   }
 }));
 
-Liquid.Template.registerTag( 'cycle', new Class({
-  Extends: Liquid.Tag,
-  
+Liquid.Template.registerTag( 'cycle', Class.create(Liquid.Tag, {
+
   tagSimpleSyntax: /"[^"]+"|'[^']+'|[^\s,|]+/,
   tagNamedSyntax:  /("[^"]+"|'[^']+'|[^\s,|]+)\s*\:\s*(.*)/,
-  
-  initialize: function(tag, markup, tokens) {
+
+  initialize: function($super, tag, markup, tokens) {
     var matches, variables;
-    // Named first...
     matches = markup.match(this.tagNamedSyntax);
     if(matches) {
       this.variables = this.variablesFromString(matches[2]);
       this.name = matches[1];
     } else {
-      // Try simple...
       matches = markup.match(this.tagSimpleSyntax);
       if(matches) {
         this.variables = this.variablesFromString(markup);
         this.name = "'"+ this.variables.toString() +"'";
       } else {
-        // Punt
         throw ("Syntax error in 'cycle' - Valid syntax: cycle [name :] var [, var2, var3 ...]");
       }
     }
-    this.parent(tag, markup, tokens);
+    $super(tag, markup, tokens);
   },
-  
+
   render: function(context) {
     var self   = this,
         key    = context.get(self.name),
@@ -864,11 +729,11 @@ Liquid.Template.registerTag( 'cycle', new Class({
     if(!context.registers['cycle']) {
       context.registers['cycle'] = $H({});
     }
-    
+
     if(!context.registers['cycle'][key]) {
       context.registers['cycle'][key] = 0;
     }
-    
+
     context.stack(function(){
       var iter    = context.registers['cycle'][key],
           results = context.get( self.variables[iter] );
@@ -877,10 +742,10 @@ Liquid.Template.registerTag( 'cycle', new Class({
       context.registers['cycle'][key] = iter;
       output = results;
     });
-    
+
     return output;
   },
-  
+
   variablesFromString: function(markup) {
     return markup.split(',').map(function(varname){
       var match = varname.match(/\s*("[^"]+"|'[^']+'|[^\s,|]+)\s*/);
@@ -889,12 +754,10 @@ Liquid.Template.registerTag( 'cycle', new Class({
   }
 }));
 
-Liquid.Template.registerTag( 'for', new Class({
-  Extends: Liquid.Block,
-  
+Liquid.Template.registerTag( 'for', Class.create( Liquid.Block, {
   tagSyntax: /(\w+)\s+in\s+((?:\(?[\w\-\.\[\]]\)?)+)/,
-  
-  initialize: function(tag, markup, tokens) {
+
+  initialize: function($super, tag, markup, tokens) {
     var matches = markup.match(this.tagSyntax);
     if(matches) {
       this.variableName = matches[1];
@@ -906,51 +769,48 @@ Liquid.Template.registerTag( 'for', new Class({
       if(attMatchs) {
         attMatchs.each(function(pair){
           pair = pair.split(":");
-          this.attributes[ pair[0].trim() ] = pair[1].trim();
+          this.attributes.set( pair[0].strip(), pair[1].strip());
         }, this);
       }
     } else {
       throw ("Syntax error in 'for loop' - Valid syntax: for [item] in [collection]");
     }
-    this.parent(tag, markup, tokens);
+    $super(tag, markup, tokens);
   },
-  
+
   render: function(context) {
     var self       = this,
         output     = [],
         collection = $A(context.get(this.collectionName) || []),
         range      = [0, collection.length];
-    
+
     if(!context.registers['for']){ context.registers['for'] = $H({}); }
-    
+
     if(this.attributes['limit'] || this.attributes['offset']) {
       var offset   = 0,
           limit    = 0,
           rangeEnd = 0,
           segement = null;
-      
-      if(this.attributes['offset'] == 'continue') 
+
+      if(this.attributes['offset'] == 'continue')
         { offset = context.registers['for'][this.name]; }
       else
         { offset = context.get( this.attributes['offset'] ) || 0; }
-      
+
       limit = context.get( this.attributes['limit'] );
-      
+
       rangeEnd = (limit) ? offset + limit + 1 : collection.length;
       range = [ offset, rangeEnd - 1 ];
-      
-      // Save the range end in the registers so that future calls to 
-      // offset:continue have something to pick up
+
       context.registers['for'][this.name] = rangeEnd;
     }
 
-    // Assumes the collection is an array like object...
     segment = collection.slice(range[0], range[1]);
     if(!segment || segment.length == 0){ return ''; }
-    
+
     context.stack(function(){
       var length = segment.length;
-      
+
       segment.each(function(item, index){
         context.set( self.variableName, item );
         context.set( 'forloop', {
@@ -966,31 +826,30 @@ Liquid.Template.registerTag( 'for', new Class({
         output.push( (self.renderAll(self.nodelist, context) || []).join('') );
       });
     });
-    
-    return output.join('');
+
+    return [output].flatten().join('');
   }
 }));
 
-Liquid.Template.registerTag( 'if', new Class({
-  Extends: Liquid.Block,
-  
+Liquid.Template.registerTag( 'if', Class.create(Liquid.Block, {
+
   tagSyntax: /("[^"]+"|'[^']+'|[^\s,|]+)\s*([=!<>a-z_]+)?\s*("[^"]+"|'[^']+'|[^\s,|]+)?/,
-  
-  initialize: function(tag, markup, tokens) {
+
+  initialize: function($super, tag, markup, tokens) {
     this.nodelist = [];
     this.blocks = [];
     this.pushBlock('if', markup);
-    this.parent(tag, markup, tokens);
+    $super(tag, markup, tokens);
   },
-  
-  unknownTag: function(tag, markup, tokens) {
-    if( $A(['elsif', 'else']).contains(tag) ) {
+
+  unknownTag: function($super, tag, markup, tokens) {
+    if( $A(['elsif', 'else']).include(tag) ) {
       this.pushBlock(tag, markup);
     } else {
-      this.parent(tag, markup, tokens);
+      $super(tag, markup, tokens);
     }
   },
-  
+
   render: function(context) {
     var self = this,
         output = '';
@@ -1003,9 +862,9 @@ Liquid.Template.registerTag( 'if', new Class({
         }
       };
     })
-    return $splat(output).join('');
+    return [output].flatten().join('');
   },
-  
+
   pushBlock: function(tag, markup) {
     var block;
     if(tag == 'else') {
@@ -1013,11 +872,11 @@ Liquid.Template.registerTag( 'if', new Class({
     } else {
       var expressions = markup.split(/\b(and|or)\b/).reverse(),
           expMatches  = expressions.shift().match( this.tagSyntax );
-      
+
       if(!expMatches){ throw ("Syntax Error in tag '"+ tag +"' - Valid syntax: "+ tag +" [expression]"); }
-      
+
       var condition = new Liquid.Condition(expMatches[1], expMatches[2], expMatches[3]);
-      
+
       while(expressions.length > 0) {
         var operator = expressions.shift(),
             expMatches  = expressions.shift().match( this.tagSyntax );
@@ -1027,7 +886,7 @@ Liquid.Template.registerTag( 'if', new Class({
         newCondition[operator](condition);
         condition = newCondition;
       }
-      
+
       block = condition;
     }
     block.attach($A([]));
@@ -1036,8 +895,7 @@ Liquid.Template.registerTag( 'if', new Class({
   }
 }));
 
-Liquid.Template.registerTag( 'ifchanged', new Class({
-  Extends: Liquid.Block,
+Liquid.Template.registerTag( 'ifchanged', Class.create( Liquid.Block, {
 
   render: function(context) {
     var self = this,
@@ -1053,13 +911,11 @@ Liquid.Template.registerTag( 'ifchanged', new Class({
   }
 }));
 
-Liquid.Template.registerTag( 'include', new Class({
-  
-  Extends: Liquid.Tag,
-  
+Liquid.Template.registerTag( 'include', Class.create( Liquid.Tag, {
+
   tagSyntax: /((?:"[^"]+"|'[^']+'|[^\s,|]+)+)(\s+(?:with|for)\s+((?:"[^"]+"|'[^']+'|[^\s,|]+)+))?/,
-  
-  initialize: function(tag, markup, tokens) {
+
+  initialize: function($super, tag, markup, tokens) {
     var matches = (markup || '').match(this.tagSyntax);
     if(matches) {
       this.templateName = matches[1];
@@ -1071,13 +927,13 @@ Liquid.Template.registerTag( 'include', new Class({
       if(attMatchs) {
         attMatchs.each(function(pair){
           pair = pair.split(":");
-          this.attributes[ pair[0].trim() ] = pair[1].trim();
+          this.attributes.set( pair[0].strip(), pair[1].strip() );
         }, this);
       }
     } else {
       throw ("Error in tag 'include' - Valid syntax: include '[template]' (with|for) [object|collection]");
     }
-    this.parent(tag, markup, tokens);
+    $super(tag, markup, tokens);
   },
 
   render: function(context) {
@@ -1087,11 +943,11 @@ Liquid.Template.registerTag( 'include', new Class({
         variable = context.get((this.variableName || this.templateNameVar)),
         output   = '';
     context.stack(function(){
-      self.attributes.each(function(value, key){
-        context.set(key, context.get(value));
+      self.attributes.each(function(pair){
+        context.set(pair.key, context.get(pair.value));
       })
 
-      if($type(variable) == 'array') {
+      if(variable instanceof Array) {
         output = variable.map(function(variable){
           context.set( self.templateNameVar, variable );
           return partial.render(context);
@@ -1101,26 +957,22 @@ Liquid.Template.registerTag( 'include', new Class({
         output = partial.render(context);
       }
     });
-    output = $splat(output).join('');
+    output = [output].flatten().join('');
     return output
   }
 }));
 
-Liquid.Template.registerTag( 'unless', new Class({
-
-  Extends: Liquid.Template.tags['if'],
+Liquid.Template.registerTag( 'unless', Class.create(Liquid.Template.tags['if'], {
 
   render: function(context) {
     var self = this,
         output = '';
     context.stack(function(){
-      // The first block is called if it evaluates to false...
       var block = self.blocks[0];
       if( !block.evaluate(context) ) {
         output = self.renderAll(block.attachment, context);
         return;
       }
-      // the rest are the same..
       for (var i=1; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.evaluate(context) ) {
@@ -1132,28 +984,25 @@ Liquid.Template.registerTag( 'unless', new Class({
     return output;
   }
 }));
-// default_filters.js
-// Standard Filters
 Liquid.Template.registerFilter({
-  
+
   size: function(iterable) {
     return (iterable['length']) ? iterable.length : 0;
   },
-  
+
   downcase: function(input) {
     return input.toString().toLowerCase();
   },
-  
+
   upcase: function(input) {
     return input.toString().toUpperCase();
   },
-  
+
   capitalize: function(input) {
     return input.toString().capitalize();
   },
-  
+
   escape: function(input) {
-    // FIXME: properly HTML escape input...
     input = input.toString();
     input = input.replace(/&/g, '&amp;');
     input = input.replace(/</g, '&lt;');
@@ -1161,9 +1010,8 @@ Liquid.Template.registerFilter({
     input = input.replace(/"/g, '&quot;');
     return input;
   },
-  
+
   h: function(input) {
-    // FIXME: properly HTML escape input...
     input = input.toString();
     input = input.replace(/&/g, '&amp;');
     input = input.replace(/</g, '&lt;');
@@ -1171,7 +1019,7 @@ Liquid.Template.registerFilter({
     input = input.replace(/"/g, '&quot;');
     return input;
   },
-  
+
   truncate: function(input, length, string) {
     if(!input || input == ''){ return ''; }
     length = length || 50;
@@ -1180,7 +1028,7 @@ Liquid.Template.registerFilter({
     var seg = input.slice(0, length);
     return seg + string;
   },
-  
+
   truncatewords: function(input, words, string) {
     if(!input || input == ''){ return ''; }
     words = parseInt(words || 15);
@@ -1198,90 +1046,63 @@ Liquid.Template.registerFilter({
         l = Math.max((words), 0);
     return (wordlist.length > l) ? wordlist.slice(0,l).join(' ') + string : input;
   },
-  
+
   strip_html: function(input) {
     return input.toString().replace(/<.*?>/g, '');
   },
-  
+
   strip_newlines: function(input) {
     return input.toString().replace(/\n/g, '')
   },
-  
+
   join: function(input, separator) {
     separator = separator ||  ' ';
-    return $splat(input).join(separator);
+    return input.join(separator);
   },
-  
+
   sort: function(input) {
-    return $splat(input).sort();
+    return input.sort();
   },
-  
+
   reverse: function(input) {
-    return $splat(input).reverse();
+    return input.reverse();
   },
-  
+
   replace: function(input, string, replacement) {
     replacement = replacement || '';
     return input.toString().replace(new RegExp(string, 'g'), replacement);
   },
-  
+
   replace_first: function(input, string, replacement) {
     replacement = replacement || '';
     return input.toString().replace(new RegExp(string, ""), replacement);
   },
-  
+
   newline_to_br: function(input) {
     return input.toString().replace(/\n/g, "<br/>\n");
   },
-  
+
   date: function(input, format) {
     var date;
-    if( $type(input) == 'date' ){ date = input; }
-    if( $type(date) != 'date' && input == 'now'){ date = new Date(); }
-    if( $type(date) != 'date' ){ date = new Date(input); }
-    if( $type(date) != 'date' ){ date = new Date(Date.parse(input));}
-    if( $type(date) != 'date' ){ return input; } // Punt
+    if( input instanceof Date ){ date = input; }
+    if(! date instanceof Date && input == 'now'){ date = new Date(); }
+    if(! date instanceof Date ){ date = new Date(input); }
+    if(! date instanceof Date ){ date = new Date(Date.parse(input));}
+    if(! date instanceof Date ){ return input; } // Punt
     return date.strftime(format);
   },
-  
+
   first: function(input) {
-    return $splat(input)[0];
+    return input[0];
   },
-  
+
   last: function(input) {
-    input = $splat(input);
+    input = input;
     return input[input.length -1];
   }
 });
 
-// strftime.js
-/*
- Date.prototype.strftime LICENSE:
 
- Copyright (c) 2008, Philip S Tellis <philip@bluesmoon.info>
- All rights reserved.
- This code is distributed under the terms of the BSD licence
-
- Redistribution and use of this software in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
-
-   * Redistributions of source code must retain the above copyright notice, this list of conditions
-     and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, this list of
-     conditions and the following disclaimer in the documentation and/or other materials provided
-     with the distribution.
-   * The names of the contributors to this file may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
-// Includes inline strftime support...
 if(!(new Date()).strftime) {(function(){
 Date.ext={};Date.ext.util={};Date.ext.util.xPad=function(x,pad,r){if(typeof (r)=="undefined"){r=10}for(;parseInt(x,10)<r&&r>1;r/=10){x=pad.toString()+x}return x.toString()};Date.prototype.locale="en-GB";if(document.getElementsByTagName("html")&&document.getElementsByTagName("html")[0].lang){Date.prototype.locale=document.getElementsByTagName("html")[0].lang}Date.ext.locales={};Date.ext.locales.en={a:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],A:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],b:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],B:["January","February","March","April","May","June","July","August","September","October","November","December"],c:"%a %d %b %Y %T %Z",p:["AM","PM"],P:["am","pm"],x:"%d/%m/%y",X:"%T"};Date.ext.locales["en-US"]=Date.ext.locales.en;Date.ext.locales["en-US"].c="%a %d %b %Y %r %Z";Date.ext.locales["en-US"].x="%D";Date.ext.locales["en-US"].X="%r";Date.ext.locales["en-GB"]=Date.ext.locales.en;Date.ext.locales["en-AU"]=Date.ext.locales["en-GB"];Date.ext.formats={a:function(d){return Date.ext.locales[d.locale].a[d.getDay()]},A:function(d){return Date.ext.locales[d.locale].A[d.getDay()]},b:function(d){return Date.ext.locales[d.locale].b[d.getMonth()]},B:function(d){return Date.ext.locales[d.locale].B[d.getMonth()]},c:"toLocaleString",C:function(d){return Date.ext.util.xPad(parseInt(d.getFullYear()/100,10),0)},d:["getDate","0"],e:["getDate"," "],g:function(d){return Date.ext.util.xPad(parseInt(Date.ext.util.G(d)/100,10),0)},G:function(d){var y=d.getFullYear();var V=parseInt(Date.ext.formats.V(d),10);var W=parseInt(Date.ext.formats.W(d),10);if(W>V){y++}else{if(W===0&&V>=52){y--}}return y},H:["getHours","0"],I:function(d){var I=d.getHours()%12;return Date.ext.util.xPad(I===0?12:I,0)},j:function(d){var ms=d-new Date(""+d.getFullYear()+"/1/1 GMT");ms+=d.getTimezoneOffset()*60000;var doy=parseInt(ms/60000/60/24,10)+1;return Date.ext.util.xPad(doy,0,100)},m:function(d){return Date.ext.util.xPad(d.getMonth()+1,0)},M:["getMinutes","0"],p:function(d){return Date.ext.locales[d.locale].p[d.getHours()>=12?1:0]},P:function(d){return Date.ext.locales[d.locale].P[d.getHours()>=12?1:0]},S:["getSeconds","0"],u:function(d){var dow=d.getDay();return dow===0?7:dow},U:function(d){var doy=parseInt(Date.ext.formats.j(d),10);var rdow=6-d.getDay();var woy=parseInt((doy+rdow)/7,10);return Date.ext.util.xPad(woy,0)},V:function(d){var woy=parseInt(Date.ext.formats.W(d),10);var dow1_1=(new Date(""+d.getFullYear()+"/1/1")).getDay();var idow=woy+(dow1_1>4||dow1_1<=1?0:1);if(idow==53&&(new Date(""+d.getFullYear()+"/12/31")).getDay()<4){idow=1}else{if(idow===0){idow=Date.ext.formats.V(new Date(""+(d.getFullYear()-1)+"/12/31"))}}return Date.ext.util.xPad(idow,0)},w:"getDay",W:function(d){var doy=parseInt(Date.ext.formats.j(d),10);var rdow=7-Date.ext.formats.u(d);var woy=parseInt((doy+rdow)/7,10);return Date.ext.util.xPad(woy,0,10)},y:function(d){return Date.ext.util.xPad(d.getFullYear()%100,0)},Y:"getFullYear",z:function(d){var o=d.getTimezoneOffset();var H=Date.ext.util.xPad(parseInt(Math.abs(o/60),10),0);var M=Date.ext.util.xPad(o%60,0);return(o>0?"-":"+")+H+M},Z:function(d){return d.toString().replace(/^.*\(([^)]+)\)$/,"$1")},"%":function(d){return"%"}};Date.ext.aggregates={c:"locale",D:"%m/%d/%y",h:"%b",n:"\n",r:"%I:%M:%S %p",R:"%H:%M",t:"\t",T:"%H:%M:%S",x:"locale",X:"locale"};Date.ext.aggregates.z=Date.ext.formats.z(new Date());Date.ext.aggregates.Z=Date.ext.formats.Z(new Date());Date.ext.unsupported={};Date.prototype.strftime=function(fmt){if(!(this.locale in Date.ext.locales)){if(this.locale.replace(/-[a-zA-Z]+$/,"") in Date.ext.locales){this.locale=this.locale.replace(/-[a-zA-Z]+$/,"")}else{this.locale="en-GB"}}var d=this;while(fmt.match(/%[cDhnrRtTxXzZ]/)){fmt=fmt.replace(/%([cDhnrRtTxXzZ])/g,function(m0,m1){var f=Date.ext.aggregates[m1];return(f=="locale"?Date.ext.locales[d.locale][m1]:f)})}var str=fmt.replace(/%([aAbBCdegGHIjmMpPSuUVwWyY%])/g,function(m0,m1){var f=Date.ext.formats[m1];if(typeof (f)=="string"){return d[f]()}else{if(typeof (f)=="function"){return f.call(d,d)}else{if(typeof (f)=="object"&&typeof (f[0])=="string"){return Date.ext.util.xPad(d[f[0]](),f[1])}else{return m1}}}});d=null;return str};
 })();}

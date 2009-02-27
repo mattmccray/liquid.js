@@ -1,13 +1,18 @@
 <html>
-  <script src="../etc/mootools-1.2-core.js"></script>
+  <script src="../etc/prototype.js"></script>
   <script src="../dist/liquid.js"></script>
   <script>
-    var TopUserDrop = new Class({
-      Extends: Liquid.Drop,
+    var TopUserDrop = Class.create(Liquid.Drop, {
       name: function()  {
         return "Top User Name!!!"
       }
     });
+    
+    // Liquid.newDrop('topUser', {
+    //   name: function() {
+    //     return "Sure";
+    //   }
+    // })
     
     function parseIt() {
       var src = document.getElementById('src').value;

@@ -1,15 +1,14 @@
-Liquid.Block = new Class({
-  Extends: Liquid.Tag,
+Liquid.Block = Class.create(Liquid.Tag, {
   
-  initialize: function(tagName, markup, tokens){
+  initialize: function($super, tagName, markup, tokens){
     this.blockName = tagName;
     this.blockDelimiter = "end"+ this.blockName;
-    this.parent(tagName, markup, tokens);
+    $super(tagName, markup, tokens);
   },
   
   parse: function(tokens) {
     this.nodelist = this.nodelist || [];
-    $A(this.nodelist).empty();
+    $A(this.nodelist).clear();
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...
     while(tokens.length) { 

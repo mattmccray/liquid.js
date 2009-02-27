@@ -6,13 +6,9 @@ This is a complete port of "Liquid":http://www.liquidmarkup.org/ from Ruby to Ja
 
 Liquid.js does not use <tt>eval</tt> or <tt>with</tt>, so it's pretty clean and really safe.
 
-h2. Getting Started
-
-... I'll write this soon ...
-
 h2. Differences
 
-# Ranges. JavaScript doesn't really have Ranges like Ruby does. So when Liquid.js comes across a range "(1..5)", it creates an Array with the values 1 through 5. WARNING: It does assume numeric ranges, so (A..Z) won't work.
+# Ranges. JavaScript doesn't really have Ranges like Ruby does. So when Liquid.js comes across a range "(1..5)", it creates an Array with the values 1 through 5. NOTE: It uses Prototype's Range support, so (a..z) _should_ work.
 # 'replace' and 'replace_first' filters build RegExps from the input, so you can actually define a regexp to use in your replacement.
 # 'include' tag. By default, this will return a Liquid error (but not an exception). To use the 'include' tag, you'll need to implement your own 'filesystem' support. Which, in Liquid.js, just means you override the Liquid.readTemplateFile function to suit your own needs. Here's an example:
 
@@ -51,6 +47,5 @@ h2. References:
 
 h3. Todo
 
-* Would like to remove dependency on Mootools.
 * Add Rhino support for console-based testing?
 

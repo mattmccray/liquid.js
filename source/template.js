@@ -1,4 +1,4 @@
-Liquid.Template = new Class({
+Liquid.Template = Class.create({
 
   initialize: function() {
     this.root = null;
@@ -16,7 +16,11 @@ Liquid.Template = new Class({
 
   render: function() {
     if(!this.root){ return ''; }
-    var args = $A(arguments).associate(['ctx', 'filters', 'registers']);
+    var args = {
+      ctx: arguments[0],
+      filters: arguments[1],
+      registers: arguments[2]
+    }
     var context = null;
     
     if(args.ctx instanceof Liquid.Context ) {
@@ -24,8 +28,8 @@ Liquid.Template = new Class({
       this.assigns = context.assigns;
       this.registers = context.registers;
     } else {
-      if(args.ctx){ this.assigns.extend(args.ctx); }
-      if(args.registers){ this.registers.extend(args.registers); }
+      if(args.ctx){ this.assigns.update(args.ctx); }
+      if(args.registers){ this.registers.update(args.registers); }
       context = new Liquid.Context(this.assigns, this.registers, this.rethrowErrors)
     }
     

@@ -1,11 +1,7 @@
 var Liquid = {
 
-  version: {
-    major: 1,
-    minor: 1,
-    build: 1,
-    toString: function(){ return [this.major, this.minor, this.build].join('.'); }
-  },
+  author: '<%= AUTHOR %>',
+  version: '<%= VERSION %>',
 
   readTemplateFile: function(path) {
     throw ("This liquid context does not allow includes.");
@@ -20,3 +16,18 @@ var Liquid = {
   }
   
 }
+
+//= require "tag"
+//= require "block"
+//= require "document"
+//= require "strainer"
+//= require "context"
+//= require "template"
+//= require "variable"
+//= require "condition"
+//= require "drop"
+//= require "default_tags"
+//= require "default_filters"
+
+
+//= require <strftime>

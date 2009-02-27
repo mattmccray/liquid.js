@@ -74,15 +74,15 @@ Liquid.Template.registerFilter({
   
   join: function(input, separator) {
     separator = separator ||  ' ';
-    return $splat(input).join(separator);
+    return input.join(separator);
   },
   
   sort: function(input) {
-    return $splat(input).sort();
+    return input.sort();
   },
   
   reverse: function(input) {
-    return $splat(input).reverse();
+    return input.reverse();
   },
   
   replace: function(input, string, replacement) {
@@ -101,20 +101,20 @@ Liquid.Template.registerFilter({
   
   date: function(input, format) {
     var date;
-    if( $type(input) == 'date' ){ date = input; }
-    if( $type(date) != 'date' && input == 'now'){ date = new Date(); }
-    if( $type(date) != 'date' ){ date = new Date(input); }
-    if( $type(date) != 'date' ){ date = new Date(Date.parse(input));}
-    if( $type(date) != 'date' ){ return input; } // Punt
+    if( input instanceof Date ){ date = input; }
+    if(! date instanceof Date && input == 'now'){ date = new Date(); }
+    if(! date instanceof Date ){ date = new Date(input); }
+    if(! date instanceof Date ){ date = new Date(Date.parse(input));}
+    if(! date instanceof Date ){ return input; } // Punt
     return date.strftime(format);
   },
   
   first: function(input) {
-    return $splat(input)[0];
+    return input[0];
   },
   
   last: function(input) {
-    input = $splat(input);
+    input = input;
     return input[input.length -1];
   }
 });

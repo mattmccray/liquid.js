@@ -8,9 +8,8 @@ General:
 Differences:
 
   1) Ranges. JavaScript doesn't really have Ranges like Ruby does. So when
-     Liquid JS comes across a range "(1..5)", it creates an Array with the
-     values 1 through 5. WARNING: It does assume numeric ranges, so (A..Z)
-     won't work.
+     Liquid JS comes across a range "(1..5)", it uses Prototype's range
+     function $R() to create an array of values.
 
   2) 'replace' and 'replace_first' filters actually build RegExps from the
      input, so you can actually define a regexp to use in your replacement.
