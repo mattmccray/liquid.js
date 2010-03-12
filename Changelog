@@ -1,38 +1,40 @@
-2009-02-26 21:06:51 -0600
-Converted to Prototype, changed build system to Sprockets.
-* Now requires Prototype 1.6.0.3
+2010-03-12 14:24:08 -0600
+Added fix and test for issue #1 from github (using the date filter with 'now' string)
+
+2009-02-26 21:07:39 -0600
+* Converted to Prototype, changed build system to Sprockets. 
+* Now requires Prototype 1.6.0.3 
 * Ranges are now supported through Prototype's $R() function.
 
 2008-10-27 17:51:27 -0500
 Oops, left in some debug alerts
- 
+
 2008-10-27 17:49:50 -0500
 Bugfix for if tag -- would sometimes insert extraneous commas into output
- 
+
 2008-09-03 18:32:22 -0500
 No longer wrapped in a closure
- 
+
 2008-09-01 16:58:47 -0500
 Added support for testing in Adobe AIR
- 
+
 2008-08-31 19:56:20 -0500
 Work on the Rhino tests a little...
- 
+
 2008-08-31 18:26:02 -0500
 Added YUI compressed version
- 
+
 2008-08-31 18:23:06 -0500
 Added tests for: variable interpolation, filters, and tags... Over 130 assertions
- 
+
 2008-08-31 02:10:25 -0500
 Started on output tests...
- 
+
 2008-08-30 20:00:57 -0500
 Added short todo list
- 
+
 2008-08-30 19:48:06 -0500
 Version 0.1! Ready to start testing now...
- 
+
 2008-08-30 18:59:10 -0500
 Imported ReadMe
- 
