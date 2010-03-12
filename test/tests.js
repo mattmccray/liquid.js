@@ -221,6 +221,11 @@ var Tests = (function() {
       assertEqual( exp, render("{{src|newline_to_br}}", {src:src}) );
       assertEqual( exp, render("{{ src | newline_to_br }}", {src:src}) );
     },
+    
+    "{{ 'now' | date:'format' }}": function() { // Duplicates issue #1 from github
+      var exp = (new Date()).getFullYear();
+      assertEqual( exp, render("{{'now' | date: '%Y'}}", {}) );
+    },
 
     "{{ date | date:'format' }}": function() {
       var src = new Date('8/30/2008'),

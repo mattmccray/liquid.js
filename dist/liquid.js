@@ -1,7 +1,7 @@
 var Liquid = {
 
   author: 'M@ McCray <darthapo@gmail.com>',
-  version: '1.2',
+  version: '1.2.1',
 
   readTemplateFile: function(path) {
     throw ("This liquid context does not allow includes.");
@@ -1085,10 +1085,10 @@ Liquid.Template.registerFilter({
   date: function(input, format) {
     var date;
     if( input instanceof Date ){ date = input; }
-    if(! date instanceof Date && input == 'now'){ date = new Date(); }
-    if(! date instanceof Date ){ date = new Date(input); }
-    if(! date instanceof Date ){ date = new Date(Date.parse(input));}
-    if(! date instanceof Date ){ return input; } // Punt
+    if(!(date instanceof Date) && input == 'now'){ date = new Date(); }
+    if(!(date instanceof Date)){ date = new Date(input); }
+    if(!(date instanceof Date)){ date = new Date(Date.parse(input));}
+    if(!(date instanceof Date)){ return input; } // Punt
     return date.strftime(format);
   },
 
