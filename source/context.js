@@ -1,8 +1,8 @@
 
-Liquid.Context = Class.create({
+Liquid.Context = Klass({
 
-  initialize: function(assigns, registers, rethrowErrors) {
-    this.scopes = [ $H(assigns || {}) ];
+  init: function(assigns, registers, rethrowErrors) {
+    this.scopes = [ (assigns || {}) ]; //$H(assigns || {})
     this.registers = registers || {};
     this.errors = [];
     this.rethrowErrors = rethrowErrors;
@@ -22,7 +22,7 @@ Liquid.Context = Class.create({
   },
   
   push: function() {
-    var scpObj = $H({});
+    var scpObj = {};// $H({});
     this.scopes.unshift(scpObj);
     return scpObj // Is this right?
   },
@@ -56,7 +56,7 @@ Liquid.Context = Class.create({
       // console.log("result: "+ Object.inspect(result));
       return result;
     } else {
-      return $A(args).first(); // was: $pick
+      return args[0] ;//$A(args).first(); // was: $pick
     }
   },
   
@@ -98,7 +98,7 @@ Liquid.Context = Class.create({
           var range = key.match(/^\((\S+)\.\.(\S+)\)$/),
               left  = range[1],
               right = range[2];
-              arr   = $R(left, right).toArray();
+              arr   = $R(left, right).toArray(); // Range? Hmm...
           return arr;
      
         } else {

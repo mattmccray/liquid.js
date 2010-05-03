@@ -1,3 +1,7 @@
+if(! 'Klass' in window) {
+//= require <klass>
+}
+
 var Liquid = {
 
   author: '<%= AUTHOR %>',

@@ -1,6 +1,6 @@
-Liquid.Document = Class.create( Liquid.Block, {
+Liquid.Document = Liquid.Block({
 
-  initialize: function(tokens){
+  init: function(tokens){
     this.blockDelimiter = []; // [], really?
     this.parse(tokens);
   },

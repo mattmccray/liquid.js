@@ -1,4 +1,4 @@
-Liquid.Variable = Class.create({
+Liquid.Variable = Klass({
 
   initialize: function(markup) {
     this.markup = markup;
@@ -15,7 +15,7 @@ Liquid.Variable = Class.create({
           var matches = f.match(/\s*(\w+)/);
           if(matches) {
             var filterName = matches[1];
-            var filterArgs = []
+            var filterArgs = [] // A flatten?!
             $A(f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || []).flatten().each(function(arg){
               var cleanupMatch = arg.match(/^[\s|:|,]*(.*?)[\s]*$/);
               if(cleanupMatch)

@@ -1,6 +1,6 @@
-Liquid.Tag = Class.create({
+Liquid.Tag = Klass({
 
-  initialize: function(tagName, markup, tokens) {
+  init: function(tagName, markup, tokens) {
     this.tagName = tagName;
     this.markup = markup;
     this.nodelist = this.nodelist || [];

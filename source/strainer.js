@@ -1,6 +1,6 @@
-Liquid.Strainer = Class.create({
+Liquid.Strainer = Klass({
 
-  initialize: function(context) {
+  init: function(context) {
     this.context = context;
   },
   
@@ -14,7 +14,7 @@ Liquid.Strainer = Class.create({
   }
 });
 
-Liquid.Strainer.filters = $H({});
+Liquid.Strainer.filters = {} ;// $H({});
 
 Liquid.Strainer.globalFilter = function(filters) {
   Liquid.Strainer.filters.update(filters);
@@ -22,7 +22,7 @@ Liquid.Strainer.globalFilter = function(filters) {
 }
 
 // Array of methods to keep...
-Liquid.Strainer.requiredMethods = $A(['respondTo', 'context']); 
+Liquid.Strainer.requiredMethods = ['respondTo', 'context']; //$A(['respondTo', 'context']); 
 
 Liquid.Strainer.create = function(context) {
    // Not sure all this really matters for JS... Maybe?

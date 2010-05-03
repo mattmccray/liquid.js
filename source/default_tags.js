@@ -1,9 +1,9 @@
 // Default Tags...
-Liquid.Template.registerTag( 'assign', Class.create(Liquid.Tag, {
+Liquid.Template.registerTag( 'assign', Liquid.Tag({
 
   tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
   
-  initialize: function($super, tagName, markup, tokens) {
+  init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to   = parts[1];
@@ -11,7 +11,7 @@ Liquid.Template.registerTag( 'assign', Class.create(Liquid.Tag, {
     } else {
       throw ("Syntax error in 'assign' - Valid syntax: assign [var] = [source]");
     }
-    $super(tagName, markup, tokens)
+    this.callSuper('init', tagName, markup, tokens);
   },
   render: function(context) {
     context.scopes.last().set( this.to.toString(), context.get(this.from));
@@ -20,51 +20,51 @@ Liquid.Template.registerTag( 'assign', Class.create(Liquid.Tag, {
 }));
 
 // Cache is just like capture, but it inserts into the root scope...
-Liquid.Template.registerTag( 'cache', Class.create( Liquid.Block, {
+Liquid.Template.registerTag( 'cache', Liquid.Block({
   tagSyntax: /(\w+)/,
   
-  initialize: function($super, tagName, markup, tokens) {
+  init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to = parts[1];
     } else {
       throw ("Syntax error in 'cache' - Valid syntax: cache [var]");
     }
-    $super(tagName, markup, tokens);
+    this.callSuper('init', tagName, markup, tokens);
   },
-  render: function($super, context) {
-    var output = $super(context);
+  render: function(context) {
+    var output = this.callSuper('render', context);
     context.scopes.last()[this.to] = [output].flatten().join('');
     return '';
   }
 }));
 
 
-Liquid.Template.registerTag( 'capture', Class.create(Liquid.Block, {
+Liquid.Template.registerTag( 'capture', Liquid.Block({
   tagSyntax: /(\w+)/,
   
-  initialize: function($super, tagName, markup, tokens) {
+  init: function($tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.to = parts[1];
     } else {
       throw ("Syntax error in 'capture' - Valid syntax: capture [var]");
     }
-    $super(tagName, markup, tokens);
+    this.callSuper('init', tagName, markup, tokens);
   },
-  render: function($super, context) {
-    var output = $super(context);
+  render: function(context) {
+    var output = this.callSuper('render', context);
     context.set( this.to, [output].flatten().join('') );
     return '';
   }
 }));
 
-Liquid.Template.registerTag( 'case', Class.create(Liquid.Block, {
+Liquid.Template.registerTag( 'case', Liquid.Block({
 
   tagSyntax     : /("[^"]+"|'[^']+'|[^\s,|]+)/,
   tagWhenSyntax : /("[^"]+"|'[^']+'|[^\s,|]+)(?:(?:\s+or\s+|\s*\,\s*)("[^"]+"|'[^']+'|[^\s,|]+.*))?/,
   
-  initialize: function($super, tagName, markup, tokens) {
+  init: function(tagName, markup, tokens) {
     this.blocks = [];
     this.nodelist = [];
     
@@ -75,9 +75,9 @@ Liquid.Template.registerTag( 'case', Class.create(Liquid.Block, {
       throw ("Syntax error in 'case' - Valid syntax: case [condition]");
     }
     
-    $super(tagName, markup, tokens);
+    this.callSuper('init', tagName, markup, tokens);
   },
-  unknownTag: function($super, tag, markup, tokens) {
+  unknownTag: function(tag, markup, tokens) {
     switch(tag) {
       case 'when':
         this.recordWhenCondition(markup);
@@ -86,24 +86,24 @@ Liquid.Template.registerTag( 'case', Class.create(Liquid.Block, {
         this.recordElseCondition(markup);
         break;
       default:
-        $super(tag, markup, tokens);
+        this.callSuper('unknownTag', tag, markup, tokens);
     }
     
   },
   render: function(context) {
     var self = this,
-        output = $A([]),
+        output = [];//$A([]),
         execElseBlock = true;
 
     context.stack(function(){
       for (var i=0; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.isElse  ) {
-          if(execElseBlock == true){ output = $A([output, self.renderAll(block.attachment, context)]).flatten(); }
+          if(execElseBlock == true){ output = $[output, self.renderAll(block.attachment, context)].flatten(); }  //$A([output, self.renderAll(block.attachment, context)]).flatten(); }
           return output;
         } else if( block.evaluate(context) ) {
           execElseBlock = false;
-          output = $A([output, self.renderAll(block.attachment, context)]).flatten();
+          output = [output, self.renderAll(block.attachment, context)].flatten(); //$A([output, self.renderAll(block.attachment, context)]).flatten();
         }
       };
     });
@@ -134,18 +134,18 @@ Liquid.Template.registerTag( 'case', Class.create(Liquid.Block, {
   }
 }));
 
-Liquid.Template.registerTag( 'comment', Class.create(Liquid.Block, {
+Liquid.Template.registerTag( 'comment', Liquid.Block({
   render: function(context) {
     return '';
   }
 }));
 
-Liquid.Template.registerTag( 'cycle', Class.create(Liquid.Tag, {
+Liquid.Template.registerTag( 'cycle', Liquid.Tag({
   
   tagSimpleSyntax: /"[^"]+"|'[^']+'|[^\s,|]+/,
   tagNamedSyntax:  /("[^"]+"|'[^']+'|[^\s,|]+)\s*\:\s*(.*)/,
   
-  initialize: function($super, tag, markup, tokens) {
+  init: function(tag, markup, tokens) {
     var matches, variables;
     // Named first...
     matches = markup.match(this.tagNamedSyntax);
@@ -163,7 +163,7 @@ Liquid.Template.registerTag( 'cycle', Class.create(Liquid.Tag, {
         throw ("Syntax error in 'cycle' - Valid syntax: cycle [name :] var [, var2, var3 ...]");
       }
     }
-    $super(tag, markup, tokens);
+    this.callSuper('init', tag, markup, tokens);
   },
   
   render: function(context) {
@@ -172,7 +172,7 @@ Liquid.Template.registerTag( 'cycle', Class.create(Liquid.Tag, {
         output = '';
 
     if(!context.registers['cycle']) {
-      context.registers['cycle'] = $H({});
+      context.registers['cycle'] = {};//$H({});
     }
     
     if(!context.registers['cycle'][key]) {
@@ -199,16 +199,16 @@ Liquid.Template.registerTag( 'cycle', Class.create(Liquid.Tag, {
   }
 }));
 
-Liquid.Template.registerTag( 'for', Class.create( Liquid.Block, {
+Liquid.Template.registerTag( 'for', Liquid.Block({
   tagSyntax: /(\w+)\s+in\s+((?:\(?[\w\-\.\[\]]\)?)+)/,
   
-  initialize: function($super, tag, markup, tokens) {
+  init: function(tag, markup, tokens) {
     var matches = markup.match(this.tagSyntax);
     if(matches) {
       this.variableName = matches[1];
       this.collectionName = matches[2];
       this.name = this.variableName +"-"+ this.collectionName;
-      this.attributes = $H({});
+      this.attributes = {};///$H({});
       var attrmarkup = markup.replace(this.tagSyntax, '');
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
@@ -220,16 +220,16 @@ Liquid.Template.registerTag( 'for', Class.create( Liquid.Block, {
     } else {
       throw ("Syntax error in 'for loop' - Valid syntax: for [item] in [collection]");
     }
-    $super(tag, markup, tokens);
+    this.callSuper('init', tag, markup, tokens);
   },
   
   render: function(context) {
     var self       = this,
         output     = [],
-        collection = $A(context.get(this.collectionName) || []),
+        collection = context.get(this.collectionName) || [],//$A(context.get(this.collectionName) || []),
         range      = [0, collection.length];
     
-    if(!context.registers['for']){ context.registers['for'] = $H({}); }
+    if(!context.registers['for']){ context.registers['for'] = {}; }//$H({}); }
     
     if(this.attributes['limit'] || this.attributes['offset']) {
       var offset   = 0,
@@ -279,22 +279,22 @@ Liquid.Template.registerTag( 'for', Class.create( Liquid.Block, {
   }
 }));
 
-Liquid.Template.registerTag( 'if', Class.create(Liquid.Block, {
+Liquid.Template.registerTag( 'if', Liquid.Block({
   
   tagSyntax: /("[^"]+"|'[^']+'|[^\s,|]+)\s*([=!<>a-z_]+)?\s*("[^"]+"|'[^']+'|[^\s,|]+)?/,
   
-  initialize: function($super, tag, markup, tokens) {
+  init: function(tag, markup, tokens) {
     this.nodelist = [];
     this.blocks = [];
     this.pushBlock('if', markup);
-    $super(tag, markup, tokens);
+    this.callSuper('init', tag, markup, tokens);
   },
   
-  unknownTag: function($super, tag, markup, tokens) {
-    if( $A(['elsif', 'else']).include(tag) ) {
+  unknownTag: function(tag, markup, tokens) {
+    if( ['elsif', 'else'].include(tag) ) {
       this.pushBlock(tag, markup);
     } else {
-      $super(tag, markup, tokens);
+      this.callSuper('unknownTag', tag, markup, tokens);
     }
   },
   
@@ -337,13 +337,13 @@ Liquid.Template.registerTag( 'if', Class.create(Liquid.Block, {
       
       block = condition;
     }
-    block.attach($A([]));
+    block.attach([]);
     this.blocks.push(block);
     this.nodelist = block.attachment;
   }
 }));
 
-Liquid.Template.registerTag( 'ifchanged', Class.create( Liquid.Block, {
+Liquid.Template.registerTag( 'ifchanged', Liquid.Block({
 
   render: function(context) {
     var self = this,
@@ -359,17 +359,17 @@ Liquid.Template.registerTag( 'ifchanged', Class.create( Liquid.Block, {
   }
 }));
 
-Liquid.Template.registerTag( 'include', Class.create( Liquid.Tag, {
+Liquid.Template.registerTag( 'include', Liquid.Tag({
   
   tagSyntax: /((?:"[^"]+"|'[^']+'|[^\s,|]+)+)(\s+(?:with|for)\s+((?:"[^"]+"|'[^']+'|[^\s,|]+)+))?/,
   
-  initialize: function($super, tag, markup, tokens) {
+  init: function(tag, markup, tokens) {
     var matches = (markup || '').match(this.tagSyntax);
     if(matches) {
       this.templateName = matches[1];
       this.templateNameVar = this.templateName.substring(1, this.templateName.length - 1);
       this.variableName = matches[3];
-      this.attributes = $H({});
+      this.attributes = {}; //$H({});
 
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
@@ -381,7 +381,7 @@ Liquid.Template.registerTag( 'include', Class.create( Liquid.Tag, {
     } else {
       throw ("Error in tag 'include' - Valid syntax: include '[template]' (with|for) [object|collection]");
     }
-    $super(tag, markup, tokens);
+    this.callSuper('init', tag, markup, tokens);
   },
 
   render: function(context) {
@@ -410,7 +410,7 @@ Liquid.Template.registerTag( 'include', Class.create( Liquid.Tag, {
   }
 }));
 
-Liquid.Template.registerTag( 'unless', Class.create(Liquid.Template.tags['if'], {
+Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if']({
 
   render: function(context) {
     var self = this,

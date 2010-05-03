@@ -1,6 +1,6 @@
-Liquid.Condition = Class.create({
+Liquid.Condition = Klass({
 
-  initialize: function(left, operator, right) {
+  init: function(left, operator, right) {
     this.left = left;
     this.operator = operator;
     this.right = right;
@@ -77,7 +77,7 @@ Liquid.Condition.operators = {
   'hasValue': function(l,r) { return $H(l).get(r); }
 }
 
-Liquid.ElseCondition = Class.create(Liquid.Condition, {
+Liquid.ElseCondition = Liquid.Condition({
 
   isElse: true,
   

@@ -1,9 +1,9 @@
-Liquid.Template = Class.create({
+Liquid.Template = Klass({
 
-  initialize: function() {
+  init: function() {
     this.root = null;
-    this.registers = $H({});
-    this.assigns = $H({});
+    this.registers = {};// $H({});
+    this.assigns = {};//$H({});
     this.errors = [];
     this.rethrowErrors = false;
     this.lastContext = null;
