@@ -39,7 +39,8 @@ h2. Differences
 
 h2. Known Issues
 
-# Not tested in Internet Exploder. Known to work in Safari 3.1+ and FireFox 3+.
+# Known to work in Safari 3.1+ and FireFox 3+.
+# IE 7: passes tests but needs more actual usage testing
 
 h2. References:
 

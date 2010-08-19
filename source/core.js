@@ -31,3 +31,4 @@ var Liquid = {
 
 
 //= require <strftime>
+//= require <split>
