@@ -1,0 +1,8 @@
+# Ignore vim swap files
+*.swp
+
+# Ignore generated distribution files
+dist/*.js
+
+# Ignore per machine install of jsmin
+bin/jsmin

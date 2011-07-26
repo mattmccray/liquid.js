@@ -12,14 +12,20 @@ task :test do
   puts `java -jar test/env/js.jar test/env/test.harness.js`
 end
 
-
+# Generates the jsmin binary for this particular machine
+file "bin/jsmin" => "etc/jsmin.c" do |t|
+  # TODO Detect if gcc is missing and request to install for OS
+  # TODO Consider supporting windows and checking in exe directly, since gcc is less likely.
+  puts "Building #{t.name}..."
+  `gcc -o #{t.name} #{t.prerequisites[0]}`
+end
 
 desc "Compiles from source scripts into dist/liquid.js"
-task :build do
+task :build => 'bin/jsmin' do
   puts "Building liquid.js..."
   begin
     require 'sprockets'
-  rescue
+  rescue LoadError
     puts "Build require sprockets:"
     puts
     puts "  gem install sprockets"
@@ -36,13 +42,16 @@ task :build do
   # Generate a Sprockets::Concatenation object from the source files
   concatenation = secretary.concatenation
   # Write the concatenation to disk
+  Dir.mkdir('dist') unless File.exists?('dist')
   concatenation.save_to("dist/liquid.js")
   
   puts "Piping liquid.js through jsmin..."
-  `cat dist/liquid.js | jsmin > dist/liquid.min.js`
+  `cat dist/liquid.js | bin/jsmin > dist/liquid.min.js`
 
   puts "Piping liquid.js through yuicompressor..."
-  `java -jar $HOME/Dev/bin/yuicompressor-2.3.5.jar -o dist/liquid.ymin.js dist/liquid.js`
+  `java -jar bin/yuicompressor-2.4.6.jar -o dist/liquid.ymin.js dist/liquid.js`
   
   puts 'Done.'
 end
+
+task :default => :build
