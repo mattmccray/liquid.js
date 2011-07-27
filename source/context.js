@@ -95,23 +95,26 @@ Liquid.Context = Class.extend({
           { return parseFloat( key.replace(/^(\d[\d\.]+)$/, '$1') ); }
           
         else if((/^\((\S+)\.\.(\S+)\)$/).test(key)) {// Ranges 
-          // FIXME: This assumes number ranges... Add support for character ranges too...
-          // JavaScript doesn't have native support for those, so I turn 'em into an array of integers...
+          // JavaScript doesn't have native support for those, so I turn 'em 
+          // into an array of integers...
           var range = key.match(/^\((\S+)\.\.(\S+)\)$/),
               left  = parseInt(range[1]),
               right = parseInt(range[2]),
               arr   = [];
           // Check if left and right are NaN, if so try as characters
-          if (isNaN(left)) {
-
-          }
           if (isNaN(left) || isNaN(right)) {
-            throw 'TODO Implement character ranges';
+            // TODO Add in error checking to make sure ranges are single 
+            // character, A-Z or a-z, etc.
+            left = range[1].charCodeAt(0);
+            right = range[2].charCodeAt(0);
+
+            var limit = right-left+1;
+            for (var i=0; i<limit; i++) arr.push(String.fromCharCode(i+left)); 
           } else { // okay to make array
             var limit = right-left+1;
             for (var i=0; i<limit; i++) arr.push(i+left); 
-            return arr;
           }
+          return arr;
         } else {
           var result = this.variable(key);
           // console.log("Finding variable: "+ key)
