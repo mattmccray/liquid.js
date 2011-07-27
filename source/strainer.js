@@ -15,8 +15,6 @@ Liquid.Strainer = Class.extend({
 Liquid.Strainer.filters = {};
 
 Liquid.Strainer.globalFilter = function(filters) {
-  // FIXME These two lines seem redundant?
-  Liquid.Strainer.filters.update(filters);
   for (var f in filters) {
     Liquid.Strainer.filters[f] = filters[f];
   }

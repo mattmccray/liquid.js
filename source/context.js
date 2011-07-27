@@ -28,7 +28,9 @@ Liquid.Context = Class.extend({
   },
   
   merge: function(newScope) {
-    return this.scopes[0].update(newScope);
+    // HACK Apply from Liquid.extensions.object; extending Object sad. 
+    //return this.scopes[0].update(newScope);
+    return Liquid.extensions.object.update.call(this.scopes[0], newScope);
   },
   
   pop: function() {

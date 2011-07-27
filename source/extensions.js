@@ -89,34 +89,6 @@ if (!Array.prototype.include) {
   };
 }
 
-// Object.update
-if (!Object.prototype.update) {
-  Object.prototype.update = function(newObj) {
-    for (var p in newObj) {
-      this[p] = newObj[p];
-    }
-
-    return this;
-  };
-}
-
-// Object.hasKey
-if (!Object.prototype.hasKey) {
-  Object.prototype.hasKey = function(arg) {
-    return !!this[arg];
-  };
-}
-
-// Object.hasValue
-if (!Object.prototype.hasValue) {
-  Object.prototype.hasValue = function(arg) {
-    for (var p in this) {
-      if (this[p] == arg) return true;
-    }
-
-    return false;
-  };
-}
 
 // String.capitalize
 if (!String.prototype.capitalize) {
@@ -131,3 +103,43 @@ if (!String.prototype.strip) {
     return this.replace(/^\s+/, '').replace(/\s+$/, '');
   };
 }
+
+
+// NOTE Having issues conflicting with jQuery stuff when setting Object 
+// prototype settings; instead add into Liquid.Object.extensions and use in 
+// the particular location; can add into Object.prototype later if we want.
+Liquid.extensions = {};
+Liquid.extensions.object = {};
+
+// Object.update
+Liquid.extensions.object.update = function(newObj) {
+  for (var p in newObj) {
+    this[p] = newObj[p];
+  }
+
+  return this;
+};
+//if (!Object.prototype.update) {
+//  Object.prototype.update = Liquid.extensions.object.update
+//}
+
+// Object.hasKey
+Liquid.extensions.object.hasKey = function(arg) {
+  return !!this[arg];
+};
+//if (!Object.prototype.hasKey) {
+//  Object.prototype.hasKey = Liquid.extensions.object.hasKey
+//}
+
+// Object.hasValue
+Liquid.extensions.object.hasValue = function(arg) {
+  for (var p in this) {
+    if (this[p] == arg) return true;
+  }
+
+  return false;
+};
+//if (!Object.prototype.hasValue) {
+//  Object.prototype.hasValue = Liquid.extensions.object.hasValue
+//}
+

@@ -27,8 +27,16 @@ Liquid.Template = Class.extend({
       this.assigns = context.assigns;
       this.registers = context.registers;
     } else {
-      if(args.ctx){ this.assigns.update(args.ctx); }
-      if(args.registers){ this.registers.update(args.registers); }
+      if(args.ctx){ 
+        // HACK Apply from Liquid.extensions.object; extending Object sad.  
+        //this.assigns.update(args.ctx); 
+        Liquid.extensions.object.update.call(this.assigns, args.ctx); 
+      }
+      if(args.registers){
+        // HACK Apply from Liquid.extensions.object; extending Object sad.  
+        //this.registers.update(args.registers);
+        Liquid.extensions.object.update.call(this.registers, args.registers);
+      }
       context = new Liquid.Context(this.assigns, this.registers, this.rethrowErrors)
     }
     
