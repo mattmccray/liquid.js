@@ -1,12 +1,11 @@
-Liquid.Template = Class.create({
+Liquid.Template = Class.extend({
 
-  initialize: function() {
+  init: function() {
     this.root = null;
-    this.registers = $H({});
-    this.assigns = $H({});
+    this.registers = {};
+    this.assigns = {};
     this.errors = [];
     this.rethrowErrors = false;
-    this.lastContext = null;
   },
 
   parse: function(src) {
@@ -39,13 +38,15 @@ Liquid.Template = Class.create({
       return this.root.render(context).join('');
     } finally {
       this.errors = context.errors;
-      this.lastContext = context;
     }
   },
   
   renderWithErrors: function() {
-    this.renderWithErrors = true;
-    return this.render.apply(this, arguments);
+    var savedRethrowErrors = this.rethrowErrors;
+    this.rethrowErrors = true;
+    var res = this.render.apply(this, arguments);
+    this.rethrowErrors = savedRethrowErrors;
+    return res;
   }
 });
 

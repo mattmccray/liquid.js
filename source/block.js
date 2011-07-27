@@ -1,14 +1,18 @@
-Liquid.Block = Class.create(Liquid.Tag, {
+Liquid.Block = Liquid.Tag.extend({
   
-  initialize: function($super, tagName, markup, tokens){
+  init: function(tagName, markup, tokens){
     this.blockName = tagName;
     this.blockDelimiter = "end"+ this.blockName;
-    $super(tagName, markup, tokens);
+    this._super(tagName, markup, tokens);
   },
   
   parse: function(tokens) {
-    this.nodelist = this.nodelist || [];
-    $A(this.nodelist).clear();
+    // NOTE Don't just blindly re-initialize nodelist; inherited classes may 
+    // share this through pointers; specifically If points _nodelist at the 
+    // blocks attachment, so we need to leave that pointer to pickup stuff.
+    if (!this.nodelist) this.nodelist = [];
+    this.nodelist.clear();
+    
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...
     while(tokens.length) { 
@@ -63,7 +67,8 @@ Liquid.Block = Class.create(Liquid.Tag, {
   },
   
   renderAll: function(list, context) {
-    return $A(list || []).map(function(token, i){
+    console.log('list', list);
+    return (list || []).map(function(token, i){
       var output = '';
       try { // hmmm... feels a little heavy
         output = ( token['render'] ) ? token.render(context) : token;

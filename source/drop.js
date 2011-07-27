@@ -1,4 +1,4 @@
-Liquid.Drop = Class.create({
+Liquid.Drop = Class.extend({
   setContext: function(context) {
     this.context = context;
   },

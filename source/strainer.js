@@ -1,38 +1,36 @@
-Liquid.Strainer = Class.create({
+Liquid.Strainer = Class.extend({
 
-  initialize: function(context) {
+  init: function(context) {
     this.context = context;
   },
   
   respondTo: function(methodName) {
-//      if( /^__/.test(methodName)) return false;
-    // if((methodName in this))
-    //   console.log("FOUND "+ methodName);
-    // else
-    //   console.log("MISSING "+ methodName);
+    methodName = methodName.toString();
+    if (methodName.match(/^__/)) return false;
+    if (Liquid.Strainer.requiredMethods.include(methodName)) return false;
     return (methodName in this);
   }
 });
 
-Liquid.Strainer.filters = $H({});
+Liquid.Strainer.filters = {};
 
 Liquid.Strainer.globalFilter = function(filters) {
+  // FIXME These two lines seem redundant?
   Liquid.Strainer.filters.update(filters);
-  Liquid.Strainer.addMethods( filters );
+  for (var f in filters) {
+    Liquid.Strainer.filters[f] = filters[f];
+  }
 }
 
 // Array of methods to keep...
-Liquid.Strainer.requiredMethods = $A(['respondTo', 'context']); 
+Liquid.Strainer.requiredMethods = ['respondTo', 'context']; 
 
 Liquid.Strainer.create = function(context) {
-   // Not sure all this really matters for JS... Maybe?
   var strainer = new Liquid.Strainer(context);
-//    strainer.__proto__ = {};
-  // for(key in strainer) {
-  //   if(!Liquid.Strainer.filters.keys().include(key) || !Liquid.Strainer.requiredMethods.include(key)) {
-  //     console.log('removing '+ key)
-  //     delete strainer[key];
-  //   }
-  // }
+  for (var f in Liquid.Strainer.filters) {
+    //console.log('f', f);
+    //console.log('Liquid.Strainer.filters[f]', Liquid.Strainer.filters[f]);
+    strainer[f] = Liquid.Strainer.filters[f];
+  }
   return strainer;
 }

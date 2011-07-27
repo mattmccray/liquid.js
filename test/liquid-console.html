@@ -1,8 +1,7 @@
 <html>
-  <script src="../etc/prototype.js"></script>
   <script src="../dist/liquid.js"></script>
   <script>
-    var TopUserDrop = Class.create(Liquid.Drop, {
+    var TopUserDrop = Liquid.Drop.extend({
       name: function()  {
         return "Top User Name!!!"
       }
@@ -17,7 +16,7 @@
     function parseIt() {
       var src = document.getElementById('src').value;
       var tmpl = Liquid.parse(src);
-      var html = tmpl.render({
+      var html = tmpl.renderWithErrors({
         topUser: new TopUserDrop(),
         user: 'DarthAPO',
         today: new Date(),
