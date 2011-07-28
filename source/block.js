@@ -67,7 +67,6 @@ Liquid.Block = Liquid.Tag.extend({
   },
   
   renderAll: function(list, context) {
-    console.log('list', list);
     return (list || []).map(function(token, i){
       var output = '';
       try { // hmmm... feels a little heavy

@@ -1,3 +1,14 @@
+// Array.indexOf
+if (!Array.prototype.indexOf) {
+  Array.prototype.indexOf = function(obj) {
+    for (var i=0; i<this.length; i++) {
+      if (this[i] == obj) return i;
+    }
+    
+    return -1;
+  };
+}
+
 // Array.clear
 if (!Array.prototype.clear) {
   Array.prototype.clear = function() {

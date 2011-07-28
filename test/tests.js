@@ -2,7 +2,7 @@
 var Tests = (function() { 
   // helper functions...
   function render(src, ctx) {
-    return Liquid.parse(src).render(ctx);
+    return Liquid.parse(src).renderWithErrors(ctx);
   }
   return {
 

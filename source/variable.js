@@ -30,7 +30,7 @@ Liquid.Variable = Class.extend({
   
   render: function(context) {
     if(this.name == null){ return ''; }
-    output = context.get(this.name);
+    var output = context.get(this.name);
     this.filters.each(function(filter) {
       var filterName = filter[0],
           filterArgs = (filter[1] || []).map(function(arg){
