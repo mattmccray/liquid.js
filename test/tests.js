@@ -254,24 +254,21 @@ var Tests = (function() {
     note3: "Testing tags...",
     
     "{% assign varname = value %}": function() {
-      var tmpl = Liquid.parse("{% assign myVar = 'VALUE' %}");
-      tmpl.render({});
-      assertEqual('VALUE', tmpl.lastContext.get('myVar'))
+      var tmpl = Liquid.parse("{% assign myVar = 'VALUE' %}.{{ myVar }}.");
+      assertEqual('.VALUE.', tmpl.render());
 
-      tmpl = Liquid.parse("{% assign myVar = 10 %}");
-      tmpl.render({});
-      assertEqual(10, tmpl.lastContext.get('myVar'))
+      tmpl = Liquid.parse("{% assign myVar = 10 %}.{{ myVar }}.");
+      assertEqual('.10.', tmpl.render());
 
-      tmpl = Liquid.parse("{% assign myVar = 5.5 %}");
-      tmpl.render({});
-      assertEqual(5.5, tmpl.lastContext.get('myVar'))
+      tmpl = Liquid.parse("{% assign myVar = 5.5 %}.{{ myVar }}.");
+      assertEqual('.5.5.', tmpl.render());
 
-      tmpl = Liquid.parse("{% assign myVar = (1..3) %}");
-      var results = tmpl.render({});
-      assertEqual("1,2,3", tmpl.lastContext.get('myVar'))
+      tmpl = Liquid.parse("{% assign myVar = (1..3) %}.{{ myVar }}.");
+      assertEqual(".1,2,3.", tmpl.render());
 
       // Also make sure that nothing leaks out...
-      assertEqual("", results);
+      var tmpl = Liquid.parse("{% assign myVar = 'foo' %}");
+      assertEqual('', tmpl.render());
     },
     
     // "{% cache varname %} content {% endcache %}": function() {
@@ -283,11 +280,8 @@ var Tests = (function() {
     // },
     
     "{% capture varname %} content {% endcapture %}": function() {
-      var src = "{% capture myContent %}Good 'old content!{% endcapture %}Before {{ myContent }}",
-          tmpl = Liquid.parse(src),
-          result = tmpl.render({});
-      assertEqual("Before Good 'old content!", result);
-      assertEqual("Good 'old content!", tmpl.lastContext.get('myContent'))
+      var src = "{% capture myContent %}Good 'old content!{% endcapture %}Before {{ myContent }}";
+      assertEqual("Before Good 'old content!", Liquid.parse(src).render());
     },
 
     "{% case conditionLeft %} {% when conditionRight %} {% else %} {% endcase %}": function() {

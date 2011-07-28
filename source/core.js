@@ -15,8 +15,10 @@ var Liquid = {
     return Liquid.Template.parse(src);
   }
   
-}
+};
 
+//= require "extensions"
+//= require "class"
 //= require "tag"
 //= require "block"
 //= require "document"

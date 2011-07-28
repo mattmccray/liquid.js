@@ -1,9 +1,9 @@
 
-Liquid.Context = Class.create({
+Liquid.Context = Class.extend({
 
-  initialize: function(assigns, registers, rethrowErrors) {
-    this.scopes = [ $H(assigns || {}) ];
-    this.registers = registers || {};
+  init: function(assigns, registers, rethrowErrors) {
+    this.scopes = [ assigns ? assigns : {} ];
+    this.registers = registers ? registers : {};
     this.errors = [];
     this.rethrowErrors = rethrowErrors;
     this.strainer = Liquid.Strainer.create(this);
@@ -14,7 +14,7 @@ Liquid.Context = Class.create({
   },
   
   set: function(varname, value) {
-    this.scopes[0].set(varname, value);
+    this.scopes[0][varname] = value;
   },
   
   hasKey: function(key) {
@@ -22,13 +22,15 @@ Liquid.Context = Class.create({
   },
   
   push: function() {
-    var scpObj = $H({});
+    var scpObj = {};
     this.scopes.unshift(scpObj);
     return scpObj // Is this right?
   },
   
   merge: function(newScope) {
-    return this.scopes[0].update(newScope);
+    // HACK Apply from Liquid.extensions.object; extending Object sad. 
+    //return this.scopes[0].update(newScope);
+    return Liquid.extensions.object.update.call(this.scopes[0], newScope);
   },
   
   pop: function() {
@@ -40,7 +42,7 @@ Liquid.Context = Class.create({
     var result = null;
     this.push();
     try {
-      result = lambda.apply(bind || this.strainer);
+      result = lambda.apply(bind ? bind : this.strainer);
     } finally {
       this.pop();
     }
@@ -49,14 +51,14 @@ Liquid.Context = Class.create({
   
   invoke: function(method, args) {
     if( this.strainer.respondTo(method) ) {
-      // console.log('found method '+ method)
-      // console.log("INVOKE: "+ method)
-      // console.log(Object.inspect(args))
+      // console.log('found method '+ method);
+      // console.log("INVOKE: "+ method);
+      // console.log('args', args);
       var result = this.strainer[method].apply(this.strainer, args);
-      // console.log("result: "+ Object.inspect(result));
+      // console.log("result: "+ result);
       return result;
     } else {
-      return $A(args).first(); // was: $pick
+      return (args.length == 0) ? null : args[0]; // was: $pick
     }
   },
   
@@ -93,14 +95,26 @@ Liquid.Context = Class.create({
           { return parseFloat( key.replace(/^(\d[\d\.]+)$/, '$1') ); }
           
         else if((/^\((\S+)\.\.(\S+)\)$/).test(key)) {// Ranges 
-          // FIXME: This assumes number ranges... Add support for character ranges too...
-          // JavaScript doesn't have native support for those, so I turn 'em into an array of integers...
+          // JavaScript doesn't have native support for those, so I turn 'em 
+          // into an array of integers...
           var range = key.match(/^\((\S+)\.\.(\S+)\)$/),
-              left  = range[1],
-              right = range[2];
-              arr   = $R(left, right).toArray();
+              left  = parseInt(range[1]),
+              right = parseInt(range[2]),
+              arr   = [];
+          // Check if left and right are NaN, if so try as characters
+          if (isNaN(left) || isNaN(right)) {
+            // TODO Add in error checking to make sure ranges are single 
+            // character, A-Z or a-z, etc.
+            left = range[1].charCodeAt(0);
+            right = range[2].charCodeAt(0);
+
+            var limit = right-left+1;
+            for (var i=0; i<limit; i++) arr.push(String.fromCharCode(i+left)); 
+          } else { // okay to make array
+            var limit = right-left+1;
+            for (var i=0; i<limit; i++) arr.push(i+left); 
+          }
           return arr;
-     
         } else {
           var result = this.variable(key);
           // console.log("Finding variable: "+ key)
@@ -113,11 +127,11 @@ Liquid.Context = Class.create({
   findVariable: function(key) {
     for (var i=0; i < this.scopes.length; i++) {
       var scope = this.scopes[i];
-      if( scope && scope.keys().include(key) ) {
-        var variable = scope.get(key);
+      if( scope && !!scope[key] ) {
+        var variable = scope[key];
         if(typeof(variable) == 'function'){
           variable = variable.apply(this); 
-          scope.set(key, variable);
+          scope[key] = variable;
         }
         if(variable && typeof(variable) == 'object' && ('toLiquid' in variable)) {
           variable = variable.toLiquid(); 
@@ -205,7 +219,7 @@ Liquid.Context = Class.create({
   handleError: function(err) {
     this.errors.push(err);
     if(this.rethrowErrors){ throw err; }
-    return "Liquid error: "+ (err.message || err.description || err);
+    return "Liquid error: " + (err.message ? err.message : (err.description ? err.description : err));
   }
 
 });

@@ -2,7 +2,6 @@
 load('test/env/dom.js');
 
 // Liquid dependencies
-load('etc/prototype.js');
 
 // Flippin' strftime needs this:
 var document = {
