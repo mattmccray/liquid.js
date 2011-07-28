@@ -1,12 +1,11 @@
-Liquid.Template = Class.create({
+Liquid.Template = Class.extend({
 
-  initialize: function() {
+  init: function() {
     this.root = null;
-    this.registers = $H({});
-    this.assigns = $H({});
+    this.registers = {};
+    this.assigns = {};
     this.errors = [];
     this.rethrowErrors = false;
-    this.lastContext = null;
   },
 
   parse: function(src) {
@@ -28,8 +27,16 @@ Liquid.Template = Class.create({
       this.assigns = context.assigns;
       this.registers = context.registers;
     } else {
-      if(args.ctx){ this.assigns.update(args.ctx); }
-      if(args.registers){ this.registers.update(args.registers); }
+      if(args.ctx){ 
+        // HACK Apply from Liquid.extensions.object; extending Object sad.  
+        //this.assigns.update(args.ctx); 
+        Liquid.extensions.object.update.call(this.assigns, args.ctx); 
+      }
+      if(args.registers){
+        // HACK Apply from Liquid.extensions.object; extending Object sad.  
+        //this.registers.update(args.registers);
+        Liquid.extensions.object.update.call(this.registers, args.registers);
+      }
       context = new Liquid.Context(this.assigns, this.registers, this.rethrowErrors)
     }
     
@@ -39,13 +46,15 @@ Liquid.Template = Class.create({
       return this.root.render(context).join('');
     } finally {
       this.errors = context.errors;
-      this.lastContext = context;
     }
   },
   
   renderWithErrors: function() {
-    this.renderWithErrors = true;
-    return this.render.apply(this, arguments);
+    var savedRethrowErrors = this.rethrowErrors;
+    this.rethrowErrors = true;
+    var res = this.render.apply(this, arguments);
+    this.rethrowErrors = savedRethrowErrors;
+    return res;
   }
 });
 
