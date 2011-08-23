@@ -1,6 +1,6 @@
-Liquid.Condition = Class.create({
+Liquid.Condition = Class.extend({
 
-  initialize: function(left, operator, right) {
+  init: function(left, operator, right) {
     this.left = left;
     this.operator = operator;
     this.right = right;
@@ -72,12 +72,15 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return $A(l).include(r); },
-  'hasKey':   function(l,r) { return $H(l).keys().include(r); },
-  'hasValue': function(l,r) { return $H(l).get(r); }
+  'contains': function(l,r) { return l.include(r); },
+  // HACK Apply from Liquid.extensions.object; extending Object sad. 
+  //'hasKey': function(l,r) { return l.hasKey(r); }
+  'hasKey':   function(l,r) { return Liquid.extensions.object.hasKey.call(l, r); },
+  //'hasValue': function(l,r) { return l.hasValue(r); }
+  'hasValue': function(l,r) { return Liquid.extensions.object.hasValue.call(l, r); }
 }
 
-Liquid.ElseCondition = Class.create(Liquid.Condition, {
+Liquid.ElseCondition = Liquid.Condition.extend({
 
   isElse: true,
   

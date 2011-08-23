@@ -1,6 +1,6 @@
-Liquid.Variable = Class.create({
+Liquid.Variable = Class.extend({
 
-  initialize: function(markup) {
+  init: function(markup) {
     this.markup = markup;
     this.name = null;
     this.filters = [];
@@ -15,8 +15,8 @@ Liquid.Variable = Class.create({
           var matches = f.match(/\s*(\w+)/);
           if(matches) {
             var filterName = matches[1];
-            var filterArgs = []
-            $A(f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || []).flatten().each(function(arg){
+            var filterArgs = [];
+            (f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || []).flatten().each(function(arg){
               var cleanupMatch = arg.match(/^[\s|:|,]*(.*?)[\s]*$/);
               if(cleanupMatch)
                 { filterArgs.push( cleanupMatch[1] );}
@@ -30,14 +30,14 @@ Liquid.Variable = Class.create({
   
   render: function(context) {
     if(this.name == null){ return ''; }
-    output = context.get(this.name);
+    var output = context.get(this.name);
     this.filters.each(function(filter) {
       var filterName = filter[0],
-          filterArgs = $A(filter[1] || []).map(function(arg){
+          filterArgs = (filter[1] || []).map(function(arg){
             return context.get(arg);
           });
       filterArgs.unshift(output); // Push in input value into the first argument spot...
-      output = context.invoke(filterName, filterArgs );
+      output = context.invoke(filterName, filterArgs);
     });
 
     return output;
