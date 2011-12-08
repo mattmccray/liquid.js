@@ -191,8 +191,8 @@ Liquid.Context = Class.extend({
             else { object  = object[pos]; }
           }
           // Some special cases. If no key with the same name was found we interpret following calls
-          // as commands and call them on the current object
-          else if( typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
+          // as commands and call them on the current object if it exists
+          else if( object && typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
             object = object[part].apply(part);
             if('toLiquid' in object){ object = object.toLiquid(); }
           }
