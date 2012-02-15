@@ -1,3 +1,4 @@
+gem 'sprockets', '=1.0.2'
 
 desc "Test javascript in Adobe AIR... Required AIR SDK"
 task :test_air do
@@ -24,7 +25,7 @@ desc "Compiles from source scripts into dist/liquid.js"
 task :build => 'bin/jsmin' do
   puts "Building liquid.js..."
   begin
-    require 'sprockets'
+    require 'Sprockets'
   rescue LoadError
     puts "Build require sprockets:"
     puts
@@ -36,7 +37,8 @@ task :build => 'bin/jsmin' do
   secretary = Sprockets::Secretary.new(
     :asset_root   => "assets",
     :load_path    => ["source", "etc", "."],
-    :source_files => ["source/core.js"]
+    :source_files => ["source/core.js"],
+    :strip_comments => true
   )
 
   # Generate a Sprockets::Concatenation object from the source files

@@ -43,7 +43,9 @@ Liquid.Template.registerFilter({
     string = string || "...";
 
     var seg = input.slice(0, length);
-    return seg + string;
+    return (input.length > length ?
+            input.slice(0, length) + string : 
+            input);
   },
   
   truncatewords: function(input, words, string) {
