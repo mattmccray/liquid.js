@@ -369,6 +369,14 @@ var Tests = (function() {
       assertEqual("TRUE",  render("{% unless 1 < 1 %}TRUE{% else %}FALSE{% endunless %}"))
       assertEqual("FALSE", render("{% unless 1 <= 1 %}TRUE{% else %}FALSE{% endunless %}"))
       assertEqual("FALSE", render("{% unless 1 >= 1 %}TRUE{% else %}FALSE{% endunless %}"))
+    },
+
+    note4: "Testing context...",
+
+    "{{ collection['missing_key'].value }}": function() {
+      // TODO Consider using a Context object directly instead, calling variable on it directly
+      assertEqual("", render("{{ collection['missing_key'].value }}"))
+      assertEqual("", render("{{ collection['missing_key'].value }}", {collection: {}}))
     }
   }
 })();
