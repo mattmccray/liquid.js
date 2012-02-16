@@ -1,4 +1,3 @@
-
 Liquid.Context = Class.extend({
 
   init: function(assigns, registers, rethrowErrors) {
@@ -185,7 +184,7 @@ Liquid.Context = Class.extend({
           }
           // Array
           else if( (/^\d+$/).test(part) ) {
-            pos = parseInt(part);
+            var pos = parseInt(part);
             if( typeof(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
             if(typeof(object[pos]) == 'object' && typeof(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
             else { object  = object[pos]; }
@@ -199,7 +198,7 @@ Liquid.Context = Class.extend({
           // No key was present with the desired value and it wasn't one of the directly supported
           // keywords either. The only thing we got left is to return nil
           else {
-            return null;
+            return object = null;
           }
           if(typeof(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
         }
