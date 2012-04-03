@@ -126,7 +126,7 @@ Liquid.Context = Class.extend({
   findVariable: function(key) {
     for (var i=0; i < this.scopes.length; i++) {
       var scope = this.scopes[i];
-      if( scope && !!scope[key] ) {
+      if( scope && typeof(scope[key]) !== 'undefined' ) {
         var variable = scope[key];
         if(typeof(variable) == 'function'){
           variable = variable.apply(this); 
