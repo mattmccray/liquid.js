@@ -252,7 +252,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       var offset   = 0,
           limit    = 0,
           rangeEnd = 0,
-          segement = null;
+          segment = null;
       
       if(this.attributes['offset'] == 'continue') 
         { offset = context.registers['for'][this.name]; }
