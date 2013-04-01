@@ -1,3 +1,12 @@
+# v2.0.0
+
+- Refactored source to CoffeeScript
+- Cleaned up build system, uses Node/NPM
+- Better node support
+- Updated vendor scripts: strftime supports locale now
+
+# v1.2.1
+
 2010-03-12 14:24:08 -0600
 Added fix and test for issue #1 from github (using the date filter with 'now' string)
 
