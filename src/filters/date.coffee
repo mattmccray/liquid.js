@@ -1,6 +1,6 @@
 Liquid.Template.registerFilter
 
-  date: (input, format)->
+  date: (input, format, locale)->
     date= if input instanceof Date
         input 
       else if input is 'now'
@@ -9,6 +9,6 @@ Liquid.Template.registerFilter
         new Date(input)
     date= new Date(Date.parse(input)) unless date instanceof Date
     if date instanceof Date
-      date.strftime(format)
+      strftime(format, date, locale)
     else
       input 

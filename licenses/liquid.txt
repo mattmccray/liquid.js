@@ -1,9 +1,8 @@
 /* Copyright (c) 2005, 2006 Tobias Luetke,
 
-   JavaScript port by M@ McCray (http://www.mattmccray.com)
-   Requires Prototype 1.6+
+   JavaScript port by Matt McCray (http://www.mattmccray.com)
    
-   http://github.com/darthapo/liquid.js/wikis
+   https://github.com/darthapo/liquid.js
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
