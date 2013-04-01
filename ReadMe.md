@@ -1,5 +1,7 @@
 # Liquid.js
 
+**Version 2**
+
 This is a complete port of [Liquid](http://www.liquidmarkup.org/) from Ruby to 
 JavaScript. Any template that Ruby Liquid can compile and render, Liquid.js 
 should too.
@@ -58,6 +60,8 @@ Here's an example:
 
 ## Known Issues
 
+**Previous Version**
+
 - Known to work in Safari 3.1+ and FireFox 3+.
 - IE 7: passes tests but needs more actual usage testing
 
@@ -68,7 +72,8 @@ Here's an example:
 ## Development
 
 - Clone/fork the repo from github
-- Run `npm install` to install all the build dependencies
+- You need node/npm setup on your system, then run `npm install` to install 
+  all the build dependencies
 
 You're ready to go. The source (coffeescript) files are in the `source/` folder.
 To compile, just run:
@@ -83,18 +88,8 @@ That's it. Have fun.
 
 ### TODO
 
-- Make `readTemplateFile` support async -- maybe like this?
-
-```javascript
-
-Liquid.readTemplateFile= function(path, supply){
-  var template_contents= '';
-
-  // Fetch content from XHR, or FileSystem, or whatever
-
-  supply(template_contents);
-}
-
-```
-
 - Convert tests to Mocha + Chai
+- More tests (including `Drops`)
+- Add better support for node.js (express)
+- Add examples for using it on the server, with express, and on the client
+  with some MVCs du jour -- Backbone, probably.
