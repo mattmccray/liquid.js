@@ -1,80 +1,80 @@
-var hackObjectEach = function(fun /*, thisp*/) {
-  if (typeof fun != "function")
-    throw 'Object.each requires first argument to be a function';
+// var hackObjectEach = function(fun /*, thisp*/) {
+//   if (typeof fun != "function")
+//     throw 'Object.each requires first argument to be a function';
 
-  var i = 0;
-  var thisp = arguments[1];
-  for (var p in this) {
-    var value = this[p], pair = [p, value];
-    pair.key = p;
-    pair.value = value;
-    fun.call(thisp, pair, i, this);
-    i++;
-  }
+//   var i = 0;
+//   var thisp = arguments[1];
+//   for (var p in this) {
+//     var value = this[p], pair = [p, value];
+//     pair.key = p;
+//     pair.value = value;
+//     fun.call(thisp, pair, i, this);
+//     i++;
+//   }
 
-  return null;
-};
+//   return null;
+// };
 
-// Default Tags...
-Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
+// // Default Tags...
+// Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
 
-  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
+//   tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
   
-  init: function(tagName, markup, tokens) {
-    var parts = markup.match(this.tagSyntax)
-    if( parts ) {
-      this.to   = parts[1];
-      this.from = parts[2];
-    } else {
-      throw ("Syntax error in 'assign' - Valid syntax: assign [var] = [source]");
-    }
-    this._super(tagName, markup, tokens)
-  },
-  render: function(context) {
-    context.scopes.last()[this.to.toString()] = context.get(this.from);
-    return '';
-  }
-}));
+//   init: function(tagName, markup, tokens) {
+//     var parts = markup.match(this.tagSyntax)
+//     if( parts ) {
+//       this.to   = parts[1];
+//       this.from = parts[2];
+//     } else {
+//       throw ("Syntax error in 'assign' - Valid syntax: assign [var] = [source]");
+//     }
+//     this._super(tagName, markup, tokens)
+//   },
+//   render: function(context) {
+//     context.scopes.last()[this.to.toString()] = context.get(this.from);
+//     return '';
+//   }
+// }));
 
-// Cache is just like capture, but it inserts into the root scope...
-Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
-  tagSyntax: /(\w+)/,
+// // Cache is just like capture, but it inserts into the root scope...
+// Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
+//   tagSyntax: /(\w+)/,
   
-  init: function(tagName, markup, tokens) {
-    var parts = markup.match(this.tagSyntax)
-    if( parts ) {
-      this.to = parts[1];
-    } else {
-      throw ("Syntax error in 'cache' - Valid syntax: cache [var]");
-    }
-    this._super(tagName, markup, tokens);
-  },
-  render: function(context) {
-    var output = this._super(context);
-    context.scopes.last()[this.to] = [output].flatten().join('');
-    return '';
-  }
-}));
+//   init: function(tagName, markup, tokens) {
+//     var parts = markup.match(this.tagSyntax)
+//     if( parts ) {
+//       this.to = parts[1];
+//     } else {
+//       throw ("Syntax error in 'cache' - Valid syntax: cache [var]");
+//     }
+//     this._super(tagName, markup, tokens);
+//   },
+//   render: function(context) {
+//     var output = this._super(context);
+//     context.scopes.last()[this.to] = [output].flatten().join('');
+//     return '';
+//   }
+// }));
 
 
-Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
-  tagSyntax: /(\w+)/,
+// Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
+//   tagSyntax: /(\w+)/,
   
-  init: function(tagName, markup, tokens) {
-    var parts = markup.match(this.tagSyntax)
-    if( parts ) {
-      this.to = parts[1];
-    } else {
-      throw ("Syntax error in 'capture' - Valid syntax: capture [var]");
-    }
-    this._super(tagName, markup, tokens);
-  },
-  render: function(context) {
-    var output = this._super(context);
-    context.set( this.to, [output].flatten().join('') );
-    return '';
-  }
-}));
+//   init: function(tagName, markup, tokens) {
+//     var parts = markup.match(this.tagSyntax)
+//     if( parts ) {
+//       this.to = parts[1];
+//     } else {
+//       throw ("Syntax error in 'capture' - Valid syntax: capture [var]");
+//     }
+//     this._super(tagName, markup, tokens);
+//   },
+//   render: function(context) {
+//     var output = this._super(context);
+//     context.set( this.to, [output].flatten().join('') );
+//     return '';
+//   }
+// }));
 
 Liquid.Template.registerTag( 'case', Liquid.Block.extend({
 
@@ -151,11 +151,11 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
   }
 }));
 
-Liquid.Template.registerTag( 'comment', Liquid.Block.extend({
-  render: function(context) {
-    return '';
-  }
-}));
+// Liquid.Template.registerTag( 'comment', Liquid.Block.extend({
+//   render: function(context) {
+//     return '';
+//   }
+// }));
 
 Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
   

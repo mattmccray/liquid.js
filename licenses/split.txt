@@ -1,0 +1,7 @@
+/* Cross-Browser Split 1.0.1
+(c) Steven Levithan <stevenlevithan.com>; MIT License
+An ECMA-compliant, uniform cross-browser split method 
+
+Fixes problems with IE's broken String#split method.
+See http://blog.stevenlevithan.com/archives/cross-browser-split
+*/

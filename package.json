@@ -1,0 +1,31 @@
+{
+  "name": "liquid.js",
+  "version": "2.0.0",
+  "description": "JavaScript port of Tobias Luetke's Liquid template engine.",
+  "main": "liquid.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/darthapo/liquid.js.git"
+  },
+  "keywords": [
+    "liquid",
+    "template",
+    "engine"
+  ],
+  "author": "Matt McCray <matt@elucidata.net>",
+  "license": "MIT",
+  "readmeFilename": "ReadMe.md",
+  "gitHead": "4beeb10f0aae130bd8ed4682f9f2f819a25e3e2c",
+  "dependencies": {
+    "coffee-script": "~1.6.2",
+    "uglify-js": "~2.2.5",
+    "mocha": "~1.8.2",
+    "chai": "~1.5.0"
+  }
+}
