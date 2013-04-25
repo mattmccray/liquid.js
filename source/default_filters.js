@@ -78,6 +78,11 @@ Liquid.Template.registerFilter({
     separator = separator ||  ' ';
     return input.join(separator);
   },
+
+  split: function(input, separator) {
+    separator = separator ||  ' ';
+    return input.split(separator);
+  },
   
   sort: function(input) {
     return input.sort();
