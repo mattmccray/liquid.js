@@ -450,6 +450,6 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
         }
       };
     })
-    return output;
+    return [output].flatten().join('');
   }
 }));
