@@ -72,7 +72,7 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return l.include(r); },
+  'contains': function(l,r) { return l.match(r); },
   // HACK Apply from Liquid.extensions.object; extending Object sad. 
   //'hasKey': function(l,r) { return l.hasKey(r); }
   'hasKey':   function(l,r) { return Liquid.extensions.object.hasKey.call(l, r); },
