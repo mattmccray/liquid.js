@@ -328,6 +328,7 @@ var Tests = (function() {
       assertEqual("",     render("{% if 1 < 1 %}TRUE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 <= 1 %}TRUE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 >= 1 %}TRUE{% endif %}"))
+      assertEqual("TRUE", render("{% if 'Test' contains 'T' %}TRUE{% endif %}"))
       // Testing else as well...
       assertEqual("TRUE", render("{% if true %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 == 1 %}TRUE{% else %}FALSE{% endif %}"))
@@ -336,6 +337,7 @@ var Tests = (function() {
       assertEqual("FALSE",render("{% if 1 < 1 %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 <= 1 %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 >= 1 %}TRUE{% else %}FALSE{% endif %}"))
+      assertEqual("TRUE", render("{% if 'Test' contains 'T' %}TRUE{% else %}FALSE{% endif %}"))
     },
 
     "{% ifchanged %}{% endifchanged %}": function() {
@@ -361,6 +363,7 @@ var Tests = (function() {
       assertEqual("TRUE", render("{% unless 1 < 1 %}TRUE{% endunless %}"))
       assertEqual("",     render("{% unless 1 <= 1 %}TRUE{% endunless %}"))
       assertEqual("",     render("{% unless 1 >= 1 %}TRUE{% endunless %}"))
+      assertEqual("", render("{% unless 'Test' contains 'T' %}TRUE{% endunless %}"))
       // Testing else as well...
       assertEqual("FALSE", render("{% unless true %}TRUE{% else %}FALSE{% endunless %}"))
       assertEqual("FALSE", render("{% unless 1 == 1 %}TRUE{% else %}FALSE{% endunless %}"))
@@ -369,6 +372,7 @@ var Tests = (function() {
       assertEqual("TRUE",  render("{% unless 1 < 1 %}TRUE{% else %}FALSE{% endunless %}"))
       assertEqual("FALSE", render("{% unless 1 <= 1 %}TRUE{% else %}FALSE{% endunless %}"))
       assertEqual("FALSE", render("{% unless 1 >= 1 %}TRUE{% else %}FALSE{% endunless %}"))
+      assertEqual("FALSE", render("{% unless 'Test' contains 'T' %}TRUE{% else %}FALSE{% endunless %}"))
     },
 
     note4: "Testing context...",
