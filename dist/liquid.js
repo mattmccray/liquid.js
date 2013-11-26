@@ -720,7 +720,7 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return l.include(r); },
+  'contains': function(l,r) { return l.match(r); },
   'hasKey':   function(l,r) { return Liquid.extensions.object.hasKey.call(l, r); },
   'hasValue': function(l,r) { return Liquid.extensions.object.hasValue.call(l, r); }
 }
@@ -983,7 +983,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       if(attMatchs) {
         attMatchs.each(function(pair){
           pair = pair.split(":");
-          this.attributes.set[pair[0].strip()] = pair[1].strip();
+          this.attributes[pair[0].strip()] = pair[1].strip();
         }, this);
       }
     } else {
@@ -1196,7 +1196,7 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
         }
       };
     })
-    return output;
+    return [output].flatten().join('');
   }
 }));
 Liquid.Template.registerFilter({
@@ -1275,6 +1275,11 @@ Liquid.Template.registerFilter({
   join: function(input, separator) {
     separator = separator ||  ' ';
     return input.join(separator);
+  },
+
+  split: function(input, separator) {
+    separator = separator ||  ' ';
+    return input.split(separator);
   },
 
   sort: function(input) {
