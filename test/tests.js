@@ -59,6 +59,10 @@ var Tests = (function() {
       assertEqual( 'Bob', render("{{ user.name }}", {user:{ name:'Bob' }})  )
     },
 
+    '{{ parent.nullattr }}': function() {
+      assertEqual( '', render("{{ user.nullattr }}", {user:{ 'nullattr':null }})  )
+    },
+
     '{{ collection[0] }}': function() {
       assertEqual( 'Bob', render("{{ users[0] }}", {users:['Bob']})  )
     },
