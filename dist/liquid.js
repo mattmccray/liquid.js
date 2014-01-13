@@ -450,10 +450,10 @@ Liquid.Context = Class.extend({
           variable = variable.apply(this);
           scope[key] = variable;
         }
-        if(variable && typeof(variable) == 'object' && ('toLiquid' in variable)) {
+        if(variable && this._isObject(variable) && ('toLiquid' in variable)) {
           variable = variable.toLiquid();
         }
-        if(variable && typeof(variable) == 'object' && ('setContext' in variable)){
+        if(variable && this._isObject(variable) && ('setContext' in variable)){
           variable.setContext(self);
         }
         return variable;
@@ -484,18 +484,18 @@ Liquid.Context = Class.extend({
           var part = self.resolve( squareMatch[1] );
           if( typeof(object[part]) == 'function'){ object[part] = object[part].apply(this); }// Array?
           object = object[part];
-          if(typeof(object) == 'object' && ('toLiquid' in object)){ object = object.toLiquid(); }
+          if(self._isObject(object) && ('toLiquid' in object)){ object = object.toLiquid(); }
         } else {
-          if( (typeof(object) == 'object' || typeof(object) == 'hash') && (part in object)) {
+          if( (self._isObject(object) || typeof(object) == 'hash') && (part in object)) {
             var res = object[part];
             if( typeof(res) == 'function'){ res = object[part] = res.apply(self) ; }
-            if( typeof(res) == 'object' && ('toLiquid' in res)){ object = res.toLiquid(); }
+            if(self._isObject(res) && ('toLiquid' in res)){ object = res.toLiquid(); }
             else { object = res; }
           }
           else if( (/^\d+$/).test(part) ) {
             var pos = parseInt(part);
             if( typeof(object[pos]) == 'function') { object[pos] = object[pos].apply(self); }
-            if(typeof(object[pos]) == 'object' && typeof(object[pos]) == 'object' && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
+            if(self._isObject(object) && self._isObject(object[pos]) && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
             else { object  = object[pos]; }
           }
           else if( object && typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
@@ -505,7 +505,7 @@ Liquid.Context = Class.extend({
           else {
             return object = null;
           }
-          if(typeof(object) == 'object' && ('setContext' in object)){ object.setContext(self); }
+          if(self._isObject(object) && ('setContext' in object)){ object.setContext(self); }
         }
       });
     }
@@ -515,7 +515,7 @@ Liquid.Context = Class.extend({
   addFilters: function(filters) {
     filters = filters.flatten();
     filters.each(function(f){
-      if(typeof(f) != 'object'){ throw ("Expected object but got: "+ typeof(f)) }
+      if(!this._isObject(f)){ throw ("Expected object but got: "+ typeof(f)) }
       this.strainer.addMethods(f);
     });
   },
@@ -524,6 +524,10 @@ Liquid.Context = Class.extend({
     this.errors.push(err);
     if(this.rethrowErrors){ throw err; }
     return "Liquid error: " + (err.message ? err.message : (err.description ? err.description : err));
+  },
+
+  _isObject: function(obj) {
+    return obj != null && typeof(obj) == 'object';
   }
 
 });
@@ -1308,8 +1312,8 @@ Liquid.Template.registerFilter({
     var date;
     if( input instanceof Date ){ date = input; }
     if(!(date instanceof Date) && input == 'now'){ date = new Date(); }
-    if(!(date instanceof Date)){ date = new Date(input); }
-    if(!(date instanceof Date)){ date = new Date(Date.parse(input));}
+    if(!(date instanceof Date) && typeof(input) == 'number'){ date = new Date(input * 1000); }
+    if(!(date instanceof Date) && typeof(input) == 'string'){ date = new Date(Date.parse(input));}
     if(!(date instanceof Date)){ return input; } // Punt
     return date.strftime(format);
   },
