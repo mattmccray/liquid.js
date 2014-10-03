@@ -1,6 +1,14 @@
 // Standard Filters
 Liquid.Template.registerFilter({
   
+  _HTML_ESCAPE_MAP: {
+    '&': '&amp;',
+    '>': '&gt;',
+    '<': '&lt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  },
+
   size: function(iterable) {
     return (iterable['length']) ? iterable.length : 0;
   },
@@ -18,23 +26,17 @@ Liquid.Template.registerFilter({
   },
   
   escape: function(input) {
-    // FIXME: properly HTML escape input...
-    input = input.toString();
-    input = input.replace(/&/g, '&amp;');
-    input = input.replace(/</g, '&lt;');
-    input = input.replace(/>/g, '&gt;');
-    input = input.replace(/"/g, '&quot;');
-    return input;
+    var self = this;
+    return input.replace(/[&<>"']/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
   },
-  
+
   h: function(input) {
-    // FIXME: properly HTML escape input...
-    input = input.toString();
-    input = input.replace(/&/g, '&amp;');
-    input = input.replace(/</g, '&lt;');
-    input = input.replace(/>/g, '&gt;');
-    input = input.replace(/"/g, '&quot;');
-    return input;
+    var self = this;
+    return input.replace(/[&<>"']/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
   },
   
   truncate: function(input, length, string) {
@@ -110,8 +112,8 @@ Liquid.Template.registerFilter({
     var date;
     if( input instanceof Date ){ date = input; }
     if(!(date instanceof Date) && input == 'now'){ date = new Date(); }
-    if(!(date instanceof Date)){ date = new Date(input); }
-    if(!(date instanceof Date)){ date = new Date(Date.parse(input));}
+    if(!(date instanceof Date) && typeof(input) == 'number'){ date = new Date(input * 1000); }
+    if(!(date instanceof Date) && typeof(input) == 'string'){ date = new Date(Date.parse(input));}
     if(!(date instanceof Date)){ return input; } // Punt
     return date.strftime(format);
   },
@@ -123,5 +125,57 @@ Liquid.Template.registerFilter({
   last: function(input) {
     input = input;
     return input[input.length -1];
+  },
+
+  minus: function(input, number) {
+    return (Number(input) || 0) - (Number(number) || 0);
+  },
+
+  plus: function(input, number) {
+    return (Number(input) || 0) + (Number(number) || 0);
+  },
+
+  times: function(input, number) {
+    return (Number(input) || 0) * (Number(number) || 0);
+  },
+
+  divided_by: function(input, number) {
+    return (Number(input) || 0) / (Number(number) || 0);
+  },
+
+  modulo: function(input, number) {
+    return (Number(input) || 0) % (Number(number) || 0);
+  },
+
+  map: function(input, property) {
+    input = input || [];
+    var results = [];
+    for (var i = 0; i < input.length; i++) {
+      results.push(input[i][property]);
+    }
+    return results;
+  },
+  escape_once: function(input) {
+    var self = this;
+    return input.replace(/["><']|&(?!([a-zA-Z]+|(#\d+));)/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
+  },
+
+  remove: function(input, string) {
+    return input.toString().replace(new RegExp(string, 'g'), '');
+  },
+
+  remove_first: function(input, string) {
+    return input.toString().replace(string, '');
+  },
+
+  prepend: function(input, string) {
+    return '' + (string || '').toString() + (input || '').toString();
+  },
+
+  append: function(input, string) {
+    return '' + (input || '').toString() + (string || '').toString();
   }
+
 });

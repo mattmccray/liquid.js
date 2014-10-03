@@ -48,7 +48,7 @@ task :build => 'bin/jsmin' do
   concatenation.save_to("dist/liquid.js")
   
   puts "Piping liquid.js through jsmin..."
-  `cat dist/liquid.js | bin/jsmin > dist/liquid.min.js`
+  `cat dist/liquid.js | "bin/jsmin" > dist/liquid.min.js`
 
   puts "Piping liquid.js through yuicompressor..."
   `java -jar bin/yuicompressor-2.4.6.jar -o dist/liquid.ymin.js dist/liquid.js`

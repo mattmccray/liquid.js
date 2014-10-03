@@ -59,6 +59,10 @@ var Tests = (function() {
       assertEqual( 'Bob', render("{{ user.name }}", {user:{ name:'Bob' }})  )
     },
 
+    '{{ parent.nullattr }}': function() {
+      assertEqual( '', render("{{ user.nullattr }}", {user:{ 'nullattr':null }})  )
+    },
+
     '{{ collection[0] }}': function() {
       assertEqual( 'Bob', render("{{ users[0] }}", {users:['Bob']})  )
     },
@@ -251,6 +255,89 @@ var Tests = (function() {
       assertEqual( "3", render("{{ c | last }}", {c:[1,2,3]}) );
     },
     
+    '{{ number | plus:y }}': function() {
+      assertEqual( '9', render("{{x|plus:5}}", {x:4})  )
+      assertEqual( '9', render("{{ x | plus:5 }}", {x:4})  )
+      assertEqual( '9', render("{{x|plus:y}}", {x:4,y:5})  )
+      assertEqual( '9', render("{{ x | plus:y }}", {x:4,y:5})  )
+      assertEqual( '9', render("{{ x | plus:y }}", {x:'4',y:'5'})  )
+    },
+
+    '{{ number | minus:y }}': function() {
+      assertEqual( '2', render("{{x|minus:2}}", {x:4})  )
+      assertEqual( '2', render("{{ x | minus:2 }}", {x:4})  )
+      assertEqual( '2', render("{{x|minus:y}}", {x:4,y:2})  )
+      assertEqual( '2', render("{{ x | minus:y }}", {x:4,y:2})  )
+      assertEqual( '2', render("{{ x | minus:y }}", {x:'4',y:'2'})  )
+    },
+
+    '{{ number | times:y }}': function() {
+      assertEqual( '8', render("{{x|times:2}}", {x:4})  )
+      assertEqual( '8', render("{{ x | times:2 }}", {x:4})  )
+      assertEqual( '8', render("{{x|times:y}}", {x:4,y:2})  )
+      assertEqual( '8', render("{{ x | times:y }}", {x:4,y:2})  )
+      assertEqual( '8', render("{{ x | times:y }}", {x:'4',y:'2'})  )
+    },
+
+    '{{ number | divided_by:y }}': function() {
+      assertEqual( '15', render("{{x|divided_by:2}}", {x:30})  )
+      assertEqual( '15', render("{{ x | divided_by:2 }}", {x:30})  )
+      assertEqual( '15', render("{{x|divided_by:y}}", {x:30,y:2})  )
+      assertEqual( '15', render("{{ x | divided_by:y }}", {x:30,y:2})  )
+      assertEqual( '15', render("{{ x | divided_by:y }}", {x:'30',y:'2'})  )
+      assertEqual( 'Infinity', render("{{ x | divided_by:y }}", {x:'30',y:'0'})  )
+    },
+
+    '{{ number | modulo:y }}': function() {
+      assertEqual( '2', render("{{x|modulo:3}}", {x:8})  )
+      assertEqual( '2', render("{{ x | modulo:3 }}", {x:8})  )
+      assertEqual( '2', render("{{x|modulo:y}}", {x:8,y:3})  )
+      assertEqual( '2', render("{{ x | modulo:y }}", {x:8,y:3})  )
+      assertEqual( '2', render("{{ x | modulo:y }}", {x:'8',y:'3'})  )
+    },
+
+    '{{ collection | map:y }}': function() {
+      assertEqual( 'Tony,Pepper', render("{{people|map:'firstName'}}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
+      assertEqual( 'Tony,Pepper', render("{{ people | map:'firstName' }}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
+      assertEqual( 'Stark,Potts', render("{{people|map:'lastName'}}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
+      assertEqual( 'Stark,Potts', render("{{ people | map:'lastName' }}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
+    },
+
+    '{{ string | escape_once }}': function() {
+      assertEqual( '&lt;br/&gt;', render("{{'&lt;br/&gt;'|escape_once}}")  )
+      assertEqual( '&lt;br/&gt;', render("{{'&lt;br/&gt;' | escape_once }}")  )
+      assertEqual( '&lt;br/&gt; &amp; something &lt;else&gt;', render("{{'&lt;br/&gt; & something <else>'|escape_once}}")  )
+      assertEqual( '&lt;br/&gt; &amp; something &lt;else&gt;', render("{{'&lt;br/&gt; & something <else>' | escape_once }}")  )
+    },
+
+    '{{ string | remove:part }}': function() {
+      assertEqual( 'barbar', render("{{'foobarfoobar'|remove:'foo'}}")  )
+      assertEqual( 'barbar', render("{{ 'foobarfoobar' | remove:'foo' }}")  )
+      assertEqual( 'barbar', render("{{'foobarfoobar'|remove:part}}", {part:'foo'})  )
+      assertEqual( 'barbar', render("{{ 'foobarfoobar' | remove:part}}", {part:'foo'})  )
+    },
+
+    '{{ string | remove_first:part }}': function() {
+      assertEqual( 'barfoobar', render("{{'foobarfoobar'|remove_first:'foo'}}")  )
+      assertEqual( 'barfoobar', render("{{ 'foobarfoobar' | remove_first:'foo' }}")  )
+      assertEqual( 'barfoobar', render("{{'foobarfoobar'|remove_first:part}}", {part:'foo'})  )
+      assertEqual( 'barfoobar', render("{{ 'foobarfoobar' | remove_first:part}}", {part:'foo'})  )
+    },
+
+    '{{ string | prepend:more }}': function() {
+      assertEqual( 'foobar', render("{{'bar'|prepend:'foo'}}")  )
+      assertEqual( 'foobar', render("{{ 'bar' | prepend:'foo' }}")  )
+      assertEqual( 'foobar', render("{{'bar'|prepend:more}}", {more:'foo'})  )
+      assertEqual( 'foobar', render("{{ 'bar' | prepend:more}}", {more:'foo'})  )
+    },
+
+    '{{ string | append:more }}': function() {
+      assertEqual( 'foobar', render("{{'foo'|append:'bar'}}")  )
+      assertEqual( 'foobar', render("{{ 'foo' | append:'bar' }}")  )
+      assertEqual( 'foobar', render("{{'foo'|append:more}}", {more:'bar'})  )
+      assertEqual( 'foobar', render("{{ 'foo' | append:more}}", {more:'bar'})  )
+    },
+
     note3: "Testing tags...",
     
     "{% assign varname = value %}": function() {
