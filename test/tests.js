@@ -462,6 +462,14 @@ var Tests = (function() {
       assertEqual("FALSE", render("{% unless 'Test' contains 'T' %}TRUE{% else %}FALSE{% endunless %}"))
     },
 
+    "{% raw %}Raw text unprocessed by Liquid{% endraw %}": function() {
+      var rawText = "Leave {{ moustaches }} {% alone %}"
+      assertEqual(rawText, render("{% raw %}"+rawText+"{% endraw %}"));
+      
+      var postRaw = "{% raw %}" + rawText + "{% endraw %}{% if true %}{{ var }}{% endif %}"
+      assertEqual(rawText+"foo", render(postRaw, { var: 'foo' }));
+    },
+
     note4: "Testing context...",
 
     "{{ collection['missing_key'].value }}": function() {
