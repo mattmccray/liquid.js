@@ -254,7 +254,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
           rangeEnd = 0,
           segment = null;
       
-      if(this.attributes['offset'] == 'continue') 
+      if(this.attributes['offset'] == 'continue')
         { offset = context.registers['for'][this.name]; }
       else
         { offset = context.get( this.attributes['offset'] ) || 0; }
@@ -264,7 +264,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       rangeEnd = (limit) ? offset + limit + 1 : collection.length;
       range = [ offset, rangeEnd - 1 ];
       
-      // Save the range end in the registers so that future calls to 
+      // Save the range end in the registers so that future calls to
       // offset:continue have something to pick up
       context.registers['for'][this.name] = rangeEnd;
     }
@@ -451,5 +451,42 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
       };
     })
     return [output].flatten().join('');
+  }
+}));
+
+Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
+  // Override the `parse` function of Liquid.Block to simply pass along all tokens
+  // to render directly (rather than parsing them) until we reach {% endraw %}
+  parse: function(tokens) {
+    if (!this.nodelist) this.nodelist = [];
+    this.nodelist.clear();
+    
+    var token = tokens.shift();
+    tokens.push('');
+    while(tokens.length) {
+
+      if( /^\{\%/.test(token) ) { // It's a tag...
+        var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
+        
+        if(tagParts) {
+          // if we found the proper block delimitor just end parsing here and let
+          // the outer block proceed
+          if( this.blockDelimiter == tagParts[1] ) {
+            this.endTag();
+            return;
+          }
+        }
+      }
+
+      // As long as we didn't hit {% endraw %}, just render whatever we've got
+      // without processing it.
+      this.nodelist.push( token || '');
+      token = tokens.shift(); // Assign the next token to loop again...
+    }
+    this.assertMissingDelimitation();
+  },
+  
+  render: function(context) {
+    return this.nodelist.join('');
   }
 }));
