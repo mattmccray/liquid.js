@@ -1,7 +1,7 @@
 var Liquid = {
 
-  author: 'M@ McCray <darthapo@gmail.com>',
-  version: '1.2.1',
+  author: 'Matt McCray <darthapo@gmail.com>',
+  version: '1.3',
 
   readTemplateFile: function(path) {
     throw ("This liquid context does not allow includes.");
@@ -1203,7 +1203,46 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
     return [output].flatten().join('');
   }
 }));
+
+Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
+  parse: function(tokens) {
+    if (!this.nodelist) this.nodelist = [];
+    this.nodelist.clear();
+
+    var token = tokens.shift();
+    tokens.push('');
+    while(tokens.length) {
+
+      if( /^\{\%/.test(token) ) { // It's a tag...
+        var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
+
+        if(tagParts) {
+          if( this.blockDelimiter == tagParts[1] ) {
+            this.endTag();
+            return;
+          }
+        }
+      }
+
+      this.nodelist.push( token || '');
+      token = tokens.shift(); // Assign the next token to loop again...
+    }
+    this.assertMissingDelimitation();
+  },
+
+  render: function(context) {
+    return this.nodelist.join('');
+  }
+}));
 Liquid.Template.registerFilter({
+
+  _HTML_ESCAPE_MAP: {
+    '&': '&amp;',
+    '>': '&gt;',
+    '<': '&lt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  },
 
   size: function(iterable) {
     return (iterable['length']) ? iterable.length : 0;
@@ -1222,21 +1261,17 @@ Liquid.Template.registerFilter({
   },
 
   escape: function(input) {
-    input = input.toString();
-    input = input.replace(/&/g, '&amp;');
-    input = input.replace(/</g, '&lt;');
-    input = input.replace(/>/g, '&gt;');
-    input = input.replace(/"/g, '&quot;');
-    return input;
+    var self = this;
+    return input.replace(/[&<>"']/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
   },
 
   h: function(input) {
-    input = input.toString();
-    input = input.replace(/&/g, '&amp;');
-    input = input.replace(/</g, '&lt;');
-    input = input.replace(/>/g, '&gt;');
-    input = input.replace(/"/g, '&quot;');
-    return input;
+    var self = this;
+    return input.replace(/[&<>"']/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
   },
 
   truncate: function(input, length, string) {
@@ -1325,7 +1360,59 @@ Liquid.Template.registerFilter({
   last: function(input) {
     input = input;
     return input[input.length -1];
+  },
+
+  minus: function(input, number) {
+    return (Number(input) || 0) - (Number(number) || 0);
+  },
+
+  plus: function(input, number) {
+    return (Number(input) || 0) + (Number(number) || 0);
+  },
+
+  times: function(input, number) {
+    return (Number(input) || 0) * (Number(number) || 0);
+  },
+
+  divided_by: function(input, number) {
+    return (Number(input) || 0) / (Number(number) || 0);
+  },
+
+  modulo: function(input, number) {
+    return (Number(input) || 0) % (Number(number) || 0);
+  },
+
+  map: function(input, property) {
+    input = input || [];
+    var results = [];
+    for (var i = 0; i < input.length; i++) {
+      results.push(input[i][property]);
+    }
+    return results;
+  },
+  escape_once: function(input) {
+    var self = this;
+    return input.replace(/["><']|&(?!([a-zA-Z]+|(#\d+));)/g, function(chr) {
+      return self._HTML_ESCAPE_MAP[chr];
+    });
+  },
+
+  remove: function(input, string) {
+    return input.toString().replace(new RegExp(string, 'g'), '');
+  },
+
+  remove_first: function(input, string) {
+    return input.toString().replace(string, '');
+  },
+
+  prepend: function(input, string) {
+    return '' + (string || '').toString() + (input || '').toString();
+  },
+
+  append: function(input, string) {
+    return '' + (input || '').toString() + (string || '').toString();
   }
+
 });
 
 

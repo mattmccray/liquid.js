@@ -1,9 +1,43 @@
+
+1.3.0 / 2014-10-13
+==================
+
+ * Add raw tag, along with passing tests.
+ * Added more standard liquid filters
+ * Update dist
+ * Use seconds for 'date' filter
+ * Fix issue #25
+ * Updated split poly-fill.
+ * Updated dist/ builds of liquid.js
+ * Fix for contains conditional
+ * Flatten and join output for unless tag
+ * Add split filter.
+ * Fixes `for` loop error when using limit or offset
+ * Added dist files back to repo.
+ * fix typo in variable name: segement
+ * Fixes bug #13
+ * These changes address the issues mentioned in https://github.com/darthapo/liquid.js/issues/9
+ * Fix error in truncate filter.
+ * Update Rakefile to explicitly use old Sprockets version.
+ * [bug] Fix issue with collection[missing_key].value causing error with Context.
+ * fixed missing var on in source/context.js
+ * added Gemfile with proper version of Sprockets
+ * Fix bugs with IE, needed Array.prototype.indexOf and no console.log use.
+ * Merge branch 'generic_javascript'
+ * Update ReadMe with more information about project, installation, development and tools.
+ * Add in support for character ranges.
+ * Issue with extending Object.prototype, call helper functions instead.
+ * Remove prototype requirement by implementing necessary functions in extensions.
+ * Fixup build steps for better workflow.
+ * IE compatibility: fixed broken IE split. Tests now pass in IE 7
+ * IE compatibility: Remove trailing ,
+
 2010-03-12 14:24:08 -0600
 Added fix and test for issue #1 from github (using the date filter with 'now' string)
 
 2009-02-26 21:07:39 -0600
-* Converted to Prototype, changed build system to Sprockets. 
-* Now requires Prototype 1.6.0.3 
+* Converted to Prototype, changed build system to Sprockets.
+* Now requires Prototype 1.6.0.3
 * Ranges are now supported through Prototype's $R() function.
 
 2008-10-27 17:51:27 -0500
