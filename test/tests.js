@@ -1,5 +1,5 @@
 
-var Tests = (function() { 
+var Tests = (function() {
   // helper functions...
   function render(src, ctx) {
     return Liquid.parse(src).renderWithErrors(ctx);
@@ -9,7 +9,7 @@ var Tests = (function() {
     title: "Liquid.js",
     description: "Runs through all the main tags and filters to ensure compatibility with the Ruby version.",
     auto_test: true,
-  
+
     'Verify API': function() {
       assertDefined( typeof Liquid,           "Liquid is missing" );
       assertDefined( typeof Liquid.Template,  "Liquid.Template is missing" );
@@ -17,7 +17,7 @@ var Tests = (function() {
       assertDefined( typeof Liquid.Tag,       "Liquid.Tag is missing" );
       assertDefined( typeof Liquid.Block,     "Liquid.Tag is missing" );
     },
-    
+
     "Plain text pass-thru": function() {
       assertEqual( 'plain text', render('plain text')  )
     },
@@ -50,11 +50,11 @@ var Tests = (function() {
     "{{ (a..e) }}": function() {
       assertEqual( 'a,b,c,d,e', render('{{(a..e)}}')  )
     },
-    
+
     '{{ varname }}': function() {
       assertEqual( 'Bob', render("{{ user }}", {user:'Bob'})  )
     },
-    
+
     '{{ parent.child }}': function() {
       assertEqual( 'Bob', render("{{ user.name }}", {user:{ name:'Bob' }})  )
     },
@@ -70,7 +70,7 @@ var Tests = (function() {
     '{{ collection[0].child }}': function() {
       assertEqual( 'Bob', render("{{ users[0].name }}", {users:[{name:'Bob'}]})  )
     },
-    
+
     note2: "Testing filters...",
 
     '{{ string | size }}': function() {
@@ -82,7 +82,7 @@ var Tests = (function() {
       assertEqual( '3', render("{{user|size}}", {user:['','','']})  )
       assertEqual( '3', render("{{ user | size }}", {user:['','','']})  )
     },
-    
+
     '{{ string | upcase }}': function() {
       assertEqual( 'BOB', render("{{user|upcase}}", {user:'Bob'})  )
       assertEqual( 'BOB', render("{{ user | upcase }}", {user:'Bob'})  )
@@ -92,12 +92,12 @@ var Tests = (function() {
       assertEqual( 'bob', render("{{user|downcase}}", {user:'Bob'})  )
       assertEqual( 'bob', render("{{ user | downcase }}", {user:'Bob'})  )
     },
-    
+
     '{{ string | capitalize }}': function() {
       assertEqual( 'Bob', render("{{user|capitalize}}", {user:'bob'})  )
       assertEqual( 'Bob', render("{{ user | capitalize }}", {user:'bob'})  )
     },
-    
+
     '{{ string | escape }}': function() {
       assertEqual( '&lt;br/&gt;', render("{{'<br/>'|escape}}")  )
       assertEqual( '&lt;br/&gt;', render("{{ '<br/>' | escape }}")  )
@@ -106,12 +106,12 @@ var Tests = (function() {
 
 
     '{{ string | truncate }}': function() {
-      assertEqual( 
-        'I am the very model of a modern major general, rea...', 
+      assertEqual(
+        'I am the very model of a modern major general, rea...',
         render("{{'I am the very model of a modern major general, really.'|truncate}}")
       );
-      assertEqual( 
-        'I am the very model of a modern major general, rea...', 
+      assertEqual(
+        'I am the very model of a modern major general, rea...',
         render("{{'I am the very model of a modern major general, really.' | truncate}}")
       );
     },
@@ -130,61 +130,61 @@ var Tests = (function() {
     },
 
     '{{ string | truncatewords }}': function() {
-      assertEqual( 
-        'a b c d e f g h i j k l m n o...', 
+      assertEqual(
+        'a b c d e f g h i j k l m n o...',
         render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords}}")
       );
-      assertEqual( 
-        'a b c d e f g h i j k l m n o...', 
+      assertEqual(
+        'a b c d e f g h i j k l m n o...',
         render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords }}")
       );
     },
 
     '{{ string | truncatewords:5 }}': function() {
-      assertEqual( 
-        'a b c d e...', 
+      assertEqual(
+        'a b c d e...',
         render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords:5}}")
       );
-      assertEqual( 
-        'a b c d e...', 
+      assertEqual(
+        'a b c d e...',
         render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords:5 }}")
       );
     },
 
     "{{ string | truncatewords:5,'-' }}": function() {
-      assertEqual( 
-        'a b c d e-', 
+      assertEqual(
+        'a b c d e-',
         render("{{'a b c d e f g h i j k l m n o p q r s t u v w x y z'|truncatewords:5,'-'}}")
       );
-      assertEqual( 
-        'a b c d e-', 
+      assertEqual(
+        'a b c d e-',
         render("{{ 'a b c d e f g h i j k l m n o p q r s t u v w x y z' | truncatewords:5,'-' }}")
       );
     },
-    
+
     "{{ string | strip_html }}": function() {
-      assertEqual( 
-        'hello bob', 
+      assertEqual(
+        'hello bob',
         render("{{'hello <b>bob</b>'|strip_html}}")
       );
-      assertEqual( 
-        'hello bob', 
+      assertEqual(
+        'hello bob',
         render("{{ 'hello <b>bob</b>' | strip_html }}")
       );
     },
 
     "{{ string | strip_newlines }}": function() {
       var src = "\nhello \nbob \n\nold\n friend\n";
-      assertEqual( 
+      assertEqual(
         'hello bob old friend',
         render("{{src|strip_newlines}}", {src:src})
       );
-      assertEqual( 
+      assertEqual(
         'hello bob old friend',
         render("{{ src | strip_newlines }}", {src:src})
       );
     },
-    
+
     "{{ collection | join }}": function() {
       assertEqual( "1 2 3", render("{{(1..3)|join}}") );
       assertEqual( "1 2 3", render("{{ (1..3) | join }}") );
@@ -225,7 +225,7 @@ var Tests = (function() {
       assertEqual( exp, render("{{src|newline_to_br}}", {src:src}) );
       assertEqual( exp, render("{{ src | newline_to_br }}", {src:src}) );
     },
-    
+
     "{{ 'now' | date:'format' }}": function() { // Duplicates issue #1 from github
       var exp = (new Date()).getFullYear();
       assertEqual( exp, render("{{'now' | date: '%Y'}}", {}) );
@@ -254,7 +254,7 @@ var Tests = (function() {
       assertEqual( "3", render("{{c|last}}", {c:[1,2,3]}) );
       assertEqual( "3", render("{{ c | last }}", {c:[1,2,3]}) );
     },
-    
+
     '{{ number | plus:y }}': function() {
       assertEqual( '9', render("{{x|plus:5}}", {x:4})  )
       assertEqual( '9', render("{{ x | plus:5 }}", {x:4})  )
@@ -339,7 +339,7 @@ var Tests = (function() {
     },
 
     note3: "Testing tags...",
-    
+
     "{% assign varname = value %}": function() {
       var tmpl = Liquid.parse("{% assign myVar = 'VALUE' %}.{{ myVar }}.");
       assertEqual('.VALUE.', tmpl.render());
@@ -357,7 +357,7 @@ var Tests = (function() {
       var tmpl = Liquid.parse("{% assign myVar = 'foo' %}");
       assertEqual('', tmpl.render());
     },
-    
+
     // "{% cache varname %} content {% endcache %}": function() {
     //   var src = "{% cache myContent %} Good 'old content! {% endcache %}",
     //       tmpl = Liquid.parse(src),
@@ -365,7 +365,7 @@ var Tests = (function() {
     //   assertEqual("", result);
     //   assertEqual(" Good 'old content! ", tmpl.lastContext.get('myContent'))
     // },
-    
+
     "{% capture varname %} content {% endcapture %}": function() {
       var src = "{% capture myContent %}Good 'old content!{% endcapture %}Before {{ myContent }}";
       assertEqual("Before Good 'old content!", Liquid.parse(src).render());
@@ -385,11 +385,11 @@ var Tests = (function() {
       assertEqual(" Got me", tmpl.render({ testVar:null }));
       assertEqual(" Got me", tmpl.render({ }));
     },
-    
+
     "{% comment %} content {% endcomment %}": function() {
       assertEqual("", render("{% comment %} I'm a comment! {% endcomment %}"))
     },
-    
+
     "{% cycle 'odd', 'even' %}": function() {
       var src = "{% cycle 'odd', 'even' %} {% cycle 'odd', 'even' %} {% cycle 'odd', 'even' %}";
       assertEqual('odd even odd', render(src));
@@ -465,7 +465,7 @@ var Tests = (function() {
     "{% raw %}Raw text unprocessed by Liquid{% endraw %}": function() {
       var rawText = "Leave {{ moustaches }} {% alone %}"
       assertEqual(rawText, render("{% raw %}"+rawText+"{% endraw %}"));
-      
+
       var postRaw = "{% raw %}" + rawText + "{% endraw %}{% if true %}{{ var }}{% endif %}"
       assertEqual(rawText+"foo", render(postRaw, { var: 'foo' }));
     },
