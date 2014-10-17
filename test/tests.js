@@ -416,7 +416,9 @@ var Tests = (function() {
       assertEqual("TRUE", render("{% if 1 <= 1 %}TRUE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 >= 1 %}TRUE{% endif %}"))
       assertEqual("TRUE", render("{% if 'Test' contains 'T' %}TRUE{% endif %}"))
+      assertEqual("TRUE", render("{% assign arr = 'a,b,c' | split: ',' %}{% if arr contains 'b' %}TRUE{% endif %}"))
       // Testing else as well...
+      assertEqual("FALSE", render("{% assign arr = 'a,b,c' | split: ',' %}{% if arr contains 'e' %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("TRUE", render("{% if true %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("TRUE", render("{% if 1 == 1 %}TRUE{% else %}FALSE{% endif %}"))
       assertEqual("FALSE",render("{% if 1 != 1 %}TRUE{% else %}FALSE{% endif %}"))
