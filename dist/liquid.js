@@ -724,7 +724,13 @@ Liquid.Condition.operators = {
   '<=': function(l,r) { return (l <= r); },
   '>=': function(l,r) { return (l >= r); },
 
-  'contains': function(l,r) { return l.match(r); },
+  'contains': function(l,r) {
+    if ( Object.prototype.toString.call(l) === '[object Array]' ) {
+      return l.indexOf(r) >= 0;
+    } else {
+      return l.match(r);
+    }
+  },
   'hasKey':   function(l,r) { return Liquid.extensions.object.hasKey.call(l, r); },
   'hasValue': function(l,r) { return Liquid.extensions.object.hasValue.call(l, r); }
 }
@@ -1527,3 +1533,5 @@ split = split || function (undef) {
     return self;
 
 }();
+
+module.exports = Liquid;

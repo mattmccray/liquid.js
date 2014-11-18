@@ -34,3 +34,5 @@ var Liquid = {
 
 //= require <strftime>
 //= require <split>
+
+module.exports = Liquid;
