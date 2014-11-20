@@ -370,6 +370,14 @@ var Tests = (function() {
       var src = "{% capture myContent %}Good 'old content!{% endcapture %}Before {{ myContent }}";
       assertEqual("Before Good 'old content!", Liquid.parse(src).render());
     },
+    
+    "{% capture varname %}{% endcapture %}{% for i in collection %}{% capture varname %}{{ varname }}{% endcapture %}{% endfor %}": function () {
+      var src = "{% for i in (1..3) %}{% capture varname %}{{ varname }}[{{ i }}]{% endcapture %}{% endfor %}.{{ varname }}.";
+      assertEqual(".[1][2][3].", Liquid.parse(src).render());
+      
+      var src = "{% capture varname %}{% endcapture %}{% for i in (1..3) %}{% capture varname %}{{ varname }}[{{ i }}]{% endcapture %}{% endfor %}.{{ varname }}.";
+      assertEqual(".[1][2][3].", Liquid.parse(src).render());
+    },
 
     "{% case conditionLeft %} {% when conditionRight %} {% else %} {% endcase %}": function() {
       var src = "{% case testVar %}\n\
