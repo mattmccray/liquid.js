@@ -784,10 +784,10 @@ var hackObjectEach = function(fun /*, thisp*/) {
 
 Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
 
-  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*(.+)/,
 
   init: function(tagName, markup, tokens) {
-    var parts = markup.match(this.tagSyntax)
+    var parts = markup.match(this.tagSyntax);
     if( parts ) {
       this.to   = parts[1];
       this.from = parts[2];
@@ -797,7 +797,8 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
     this._super(tagName, markup, tokens)
   },
   render: function(context) {
-    context.scopes.last()[this.to.toString()] = context.get(this.from);
+    var value = new Liquid.Variable(this.from);
+    context.scopes.last()[this.to.toString()] = value.render(context);
     return '';
   }
 }));
