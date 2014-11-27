@@ -353,6 +353,9 @@ var Tests = (function() {
       tmpl = Liquid.parse("{% assign myVar = (1..3) %}.{{ myVar }}.");
       assertEqual(".1,2,3.", tmpl.render());
 
+      tmpl = Liquid.parse("{% assign myVar = 'VALUE' | downcase | capitalize %}.{{ myVar }}.");
+      assertEqual(".Value.", tmpl.render());
+
       // Also make sure that nothing leaks out...
       var tmpl = Liquid.parse("{% assign myVar = 'foo' %}");
       assertEqual('', tmpl.render());

@@ -18,10 +18,10 @@ var hackObjectEach = function(fun /*, thisp*/) {
 // Default Tags...
 Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
 
-  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*((?:"[^"]+"|'[^']+'|[^\s,|]+)+)/,
-  
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)\s*=\s*(.+)/,
+
   init: function(tagName, markup, tokens) {
-    var parts = markup.match(this.tagSyntax)
+    var parts = markup.match(this.tagSyntax);
     if( parts ) {
       this.to   = parts[1];
       this.from = parts[2];
@@ -31,7 +31,8 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
     this._super(tagName, markup, tokens)
   },
   render: function(context) {
-    context.scopes.last()[this.to.toString()] = context.get(this.from);
+    var value = new Liquid.Variable(this.from);
+    context.scopes.last()[this.to.toString()] = value.render(context);
     return '';
   }
 }));
@@ -39,7 +40,7 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
 // Cache is just like capture, but it inserts into the root scope...
 Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
   tagSyntax: /(\w+)/,
-  
+
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
@@ -59,7 +60,7 @@ Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
 
 Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   tagSyntax: /(\w+)/,
-  
+
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
@@ -80,18 +81,18 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
 
   tagSyntax     : /("[^"]+"|'[^']+'|[^\s,|]+)/,
   tagWhenSyntax : /("[^"]+"|'[^']+'|[^\s,|]+)(?:(?:\s+or\s+|\s*\,\s*)("[^"]+"|'[^']+'|[^\s,|]+.*))?/,
-  
+
   init: function(tagName, markup, tokens) {
     this.blocks = [];
     this.nodelist = [];
-    
+
     var parts = markup.match(this.tagSyntax)
     if( parts ) {
       this.left = parts[1];
     } else {
       throw ("Syntax error in 'case' - Valid syntax: case [condition]");
     }
-    
+
     this._super(tagName, markup, tokens);
   },
   unknownTag: function(tag, markup, tokens) {
@@ -105,7 +106,7 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
       default:
         this._super(tag, markup, tokens);
     }
-    
+
   },
   render: function(context) {
     var self = this,
@@ -124,7 +125,7 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
         }
       };
     });
-    
+
     return output;
   },
   recordWhenCondition: function(markup) {
@@ -133,9 +134,9 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
       if(!parts) {
         throw ("Syntax error in tag 'case' - Valid when condition: {% when [condition] [or condition2...] %} ");
       }
-      
+
       markup = parts[2];
-      
+
       var block = new Liquid.Condition(this.left, '==', parts[1]);
       this.blocks.push( block );
       this.nodelist = block.attach([]);
@@ -158,10 +159,10 @@ Liquid.Template.registerTag( 'comment', Liquid.Block.extend({
 }));
 
 Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
-  
+
   tagSimpleSyntax: /"[^"]+"|'[^']+'|[^\s,|]+/,
   tagNamedSyntax:  /("[^"]+"|'[^']+'|[^\s,|]+)\s*\:\s*(.*)/,
-  
+
   init: function(tag, markup, tokens) {
     var matches, variables;
     // Named first...
@@ -182,7 +183,7 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
     }
     this._super(tag, markup, tokens);
   },
-  
+
   render: function(context) {
     var self   = this,
         key    = context.get(self.name),
@@ -191,11 +192,11 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
     if(!context.registers['cycle']) {
       context.registers['cycle'] = {};
     }
-    
+
     if(!context.registers['cycle'][key]) {
       context.registers['cycle'][key] = 0;
     }
-    
+
     context.stack(function(){
       var iter    = context.registers['cycle'][key],
           results = context.get( self.variables[iter] );
@@ -204,10 +205,10 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
       context.registers['cycle'][key] = iter;
       output = results;
     });
-    
+
     return output;
   },
-  
+
   variablesFromString: function(markup) {
     return markup.split(',').map(function(varname){
       var match = varname.match(/\s*("[^"]+"|'[^']+'|[^\s,|]+)\s*/);
@@ -218,7 +219,7 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
 
 Liquid.Template.registerTag( 'for', Liquid.Block.extend({
   tagSyntax: /(\w+)\s+in\s+((?:\(?[\w\-\.\[\]]\)?)+)/,
-  
+
   init: function(tag, markup, tokens) {
     var matches = markup.match(this.tagSyntax);
     if(matches) {
@@ -239,32 +240,32 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
     }
     this._super(tag, markup, tokens);
   },
-  
+
   render: function(context) {
     var self       = this,
         output     = [],
         collection = (context.get(this.collectionName) || []),
         range      = [0, collection.length];
-    
+
     if(!context.registers['for']){ context.registers['for'] = {}; }
-    
+
     if(this.attributes['limit'] || this.attributes['offset']) {
       var offset   = 0,
           limit    = 0,
           rangeEnd = 0,
           segment = null;
-      
+
       if(this.attributes['offset'] == 'continue')
         { offset = context.registers['for'][this.name]; }
       else
         { offset = context.get( this.attributes['offset'] ) || 0; }
-      
+
       limit = context.get( this.attributes['limit'] );
-      
+
       rangeEnd = (limit) ? offset + limit + 1 : collection.length;
       range = [ offset, rangeEnd - 1 ];
-      
-      // Save the range end in the registers so that future calls to
+
+//       // Save the range end in the registers so that future calls to
       // offset:continue have something to pick up
       context.registers['for'][this.name] = rangeEnd;
     }
@@ -272,10 +273,10 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
     // Assumes the collection is an array like object...
     segment = collection.slice(range[0], range[1]);
     if(!segment || segment.length == 0){ return ''; }
-    
+
     context.stack(function(){
       var length = segment.length;
-      
+
       segment.each(function(item, index){
         context.set( self.variableName, item );
         context.set( 'forloop', {
@@ -291,22 +292,22 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
         output.push( (self.renderAll(self.nodelist, context) || []).join('') );
       });
     });
-    
+
     return [output].flatten().join('');
   }
 }));
 
 Liquid.Template.registerTag( 'if', Liquid.Block.extend({
-  
+
   tagSyntax: /("[^"]+"|'[^']+'|[^\s,|]+)\s*([=!<>a-z_]+)?\s*("[^"]+"|'[^']+'|[^\s,|]+)?/,
-  
+
   init: function(tag, markup, tokens) {
     this.nodelist = [];
     this.blocks = [];
     this.pushBlock('if', markup);
     this._super(tag, markup, tokens);
   },
-  
+
   unknownTag: function(tag, markup, tokens) {
     if( ['elsif', 'else'].include(tag) ) {
       this.pushBlock(tag, markup);
@@ -314,7 +315,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
       this._super(tag, markup, tokens);
     }
   },
-  
+
   render: function(context) {
     var self = this,
         output = '';
@@ -329,7 +330,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
     })
     return [output].flatten().join('');
   },
-  
+
   pushBlock: function(tag, markup) {
     var block;
     if(tag == 'else') {
@@ -337,11 +338,11 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
     } else {
       var expressions = markup.split(/\b(and|or)\b/).reverse(),
           expMatches  = expressions.shift().match( this.tagSyntax );
-      
+
       if(!expMatches){ throw ("Syntax Error in tag '"+ tag +"' - Valid syntax: "+ tag +" [expression]"); }
-      
+
       var condition = new Liquid.Condition(expMatches[1], expMatches[2], expMatches[3]);
-      
+
       while(expressions.length > 0) {
         var operator = expressions.shift(),
             expMatches  = expressions.shift().match( this.tagSyntax );
@@ -351,7 +352,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
         newCondition[operator](condition);
         condition = newCondition;
       }
-      
+
       block = condition;
     }
     block.attach([]);
@@ -377,9 +378,9 @@ Liquid.Template.registerTag( 'ifchanged', Liquid.Block.extend({
 }));
 
 Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
-  
+
   tagSyntax: /((?:"[^"]+"|'[^']+'|[^\s,|]+)+)(\s+(?:with|for)\s+((?:"[^"]+"|'[^']+'|[^\s,|]+)+))?/,
-  
+
   init: function(tag, markup, tokens) {
     var matches = (markup || '').match(this.tagSyntax);
     if(matches) {
@@ -460,14 +461,14 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
   parse: function(tokens) {
     if (!this.nodelist) this.nodelist = [];
     this.nodelist.clear();
-    
+
     var token = tokens.shift();
     tokens.push('');
     while(tokens.length) {
 
       if( /^\{\%/.test(token) ) { // It's a tag...
         var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
-        
+
         if(tagParts) {
           // if we found the proper block delimitor just end parsing here and let
           // the outer block proceed
@@ -485,7 +486,7 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
     }
     this.assertMissingDelimitation();
   },
-  
+
   render: function(context) {
     return this.nodelist.join('');
   }
