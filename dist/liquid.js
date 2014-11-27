@@ -836,7 +836,7 @@ Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.set( this.to, [output].flatten().join('') );
+    context.scopes.last()[this.to.toString()] = [output].flatten().join('');
     return '';
   }
 }));
