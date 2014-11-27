@@ -1,7 +1,7 @@
 var Liquid = {
 
   author: 'Matt McCray <darthapo@gmail.com>',
-  version: '1.3',
+  version: '1.3.1',
 
   readTemplateFile: function(path) {
     throw ("This liquid context does not allow includes.");
