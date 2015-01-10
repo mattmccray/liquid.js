@@ -10,11 +10,14 @@ Liquid.js does not use <tt>eval</tt> or <tt>with</tt>, so it's pretty clean and 
 
 h2. Installation
 
-Currently the js files are not checked into SCM since they are generated.  In order to install, follow these steps:
-# Clone the repository somewhere locally and go into the folder; i.e. 'git clone git@github.com:prevailhs/liquid.js.git'.
-# Ensure you have build-essentials installed for your system (specifically gcc) in order to use jsmin; i.e. 'sudo apt-get install build-essential' (on Ubuntu).
-# Compile the javascripts with the default rake task; i.e. 'rake'.
-# Copy the distribution files to your desired location; i.e. 'cp dist/liquid*.js ~/projects/my_project/public/javascripts/'.
+The current version of the library is checked into the dist directory.
+
+To re-build from source, follow these steps:
+
+# Clone the repository somewhere locally and go into the folder; i.e. @git clone git@github.com:/mattmccray/liquid.js.git@.
+# Run @bundle install@ to install the necessary Gemfiles.
+# Compile the JavaScript files with the default rake task; i.e. @bundle exec rake@.
+# Copy the distribution files to your desired location; i.e. @cp dist/liquid*.js ~/projects/my_project/public/javascripts/@.
 
 h2. Differences
 
