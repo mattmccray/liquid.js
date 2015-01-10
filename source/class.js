@@ -10,7 +10,7 @@
   this.Class = function(){};
  
   // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
+  this.Class.extend = function(prop) {
     var _super = this.prototype;
    
     // Instantiate a base class (but only create the instance,
@@ -61,5 +61,5 @@
    
     return Class;
   };
-})();
+}).call(Liquid);
 

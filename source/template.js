@@ -1,4 +1,4 @@
-Liquid.Template = Class.extend({
+Liquid.Template = Liquid.Class.extend({
 
   init: function() {
     this.root = null;

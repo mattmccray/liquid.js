@@ -1,4 +1,4 @@
-Liquid.Tag = Class.extend({
+Liquid.Tag = Liquid.Class.extend({
 
   init: function(tagName, markup, tokens) {
     this.tagName = tagName;

@@ -1,4 +1,4 @@
-Liquid.Condition = Class.extend({
+Liquid.Condition = Liquid.Class.extend({
 
   init: function(left, operator, right) {
     this.left = left;

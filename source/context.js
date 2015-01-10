@@ -1,4 +1,4 @@
-Liquid.Context = Class.extend({
+Liquid.Context = Liquid.Class.extend({
 
   init: function(assigns, registers, rethrowErrors) {
     this.scopes = [ assigns ? assigns : {} ];
