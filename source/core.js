@@ -35,13 +35,9 @@ var Liquid = {
 //= require <strftime>
 //= require <split>
 
-var root = this;
-
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {
     exports = module.exports = Liquid;
   }
   exports.Liquid = Liquid;
-} else {
-  root['Liquid'] = Liquid;
 }
