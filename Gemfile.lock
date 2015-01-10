@@ -1,10 +1,12 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    rake (10.4.2)
     sprockets (1.0.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  rake (~> 10.4.2)
   sprockets (~> 1.0.2)
