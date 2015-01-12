@@ -153,7 +153,7 @@ Liquid.extensions.object.hasValue = function(arg) {
 
   this.Class = function(){};
 
-  Class.extend = function(prop) {
+  this.Class.extend = function(prop) {
     var _super = this.prototype;
 
     initializing = true;
@@ -191,9 +191,9 @@ Liquid.extensions.object.hasValue = function(arg) {
 
     return Class;
   };
-})();
+}).call(Liquid);
 
-Liquid.Tag = Class.extend({
+Liquid.Tag = Liquid.Class.extend({
 
   init: function(tagName, markup, tokens) {
     this.tagName = tagName;
@@ -299,7 +299,7 @@ Liquid.Document = Liquid.Block.extend({
   assertMissingDelimitation: function() {
   }
 });
-Liquid.Strainer = Class.extend({
+Liquid.Strainer = Liquid.Class.extend({
 
   init: function(context) {
     this.context = context;
@@ -330,7 +330,7 @@ Liquid.Strainer.create = function(context) {
   }
   return strainer;
 }
-Liquid.Context = Class.extend({
+Liquid.Context = Liquid.Class.extend({
 
   init: function(assigns, registers, rethrowErrors) {
     this.scopes = [ assigns ? assigns : {} ];
@@ -531,7 +531,7 @@ Liquid.Context = Class.extend({
   }
 
 });
-Liquid.Template = Class.extend({
+Liquid.Template = Liquid.Class.extend({
 
   init: function() {
     this.root = null;
@@ -608,7 +608,7 @@ Liquid.Template.tokenize = function(src) {
 Liquid.Template.parse =  function(src) {
   return (new Liquid.Template()).parse(src);
 }
-Liquid.Variable = Class.extend({
+Liquid.Variable = Liquid.Class.extend({
 
   init: function(markup) {
     this.markup = markup;
@@ -653,7 +653,7 @@ Liquid.Variable = Class.extend({
     return output;
   }
 });
-Liquid.Condition = Class.extend({
+Liquid.Condition = Liquid.Class.extend({
 
   init: function(left, operator, right) {
     this.left = left;
@@ -748,7 +748,7 @@ Liquid.ElseCondition = Liquid.Condition.extend({
   }
 
 });
-Liquid.Drop = Class.extend({
+Liquid.Drop = Liquid.Class.extend({
   setContext: function(context) {
     this.context = context;
   },
@@ -1537,4 +1537,9 @@ split = split || function (undef) {
 
 }();
 
-module.exports = Liquid;
+if (typeof exports !== 'undefined') {
+  if (typeof module !== 'undefined' && module.exports) {
+    exports = module.exports = Liquid;
+  }
+  exports.Liquid = Liquid;
+}
