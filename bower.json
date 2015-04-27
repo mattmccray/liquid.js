@@ -1,0 +1,26 @@
+{
+  "name": "liquid.js",
+  "version": "1.3.2",
+  "homepage": "https://github.com/darthapo/liquid.js",
+  "authors": [
+    "Matt McCray <darthapo@gmail.com>"
+  ],
+  "description": "JavaScript port of Tobias Luetke's Liquid template engine.",
+  "main": "dist/liquid.min.js",
+  "keywords": [
+    "liquid",
+    "template",
+    "js"
+  ],
+  "license": "ISC",
+  "ignore": [
+    "**/.*",
+    "bin",
+    "etc",
+    "source",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
