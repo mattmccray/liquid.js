@@ -1,4 +1,4 @@
-Liquid.Strainer = Class.extend({
+Liquid.Strainer = Liquid.Class.extend({
 
   init: function(context) {
     this.context = context;

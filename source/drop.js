@@ -1,4 +1,4 @@
-Liquid.Drop = Class.extend({
+Liquid.Drop = Liquid.Class.extend({
   setContext: function(context) {
     this.context = context;
   },

@@ -1,4 +1,4 @@
-Liquid.Variable = Class.extend({
+Liquid.Variable = Liquid.Class.extend({
 
   init: function(markup) {
     this.markup = markup;
