@@ -1,20 +1,3 @@
-// Array.each
-if (!Array.prototype.each) {
-  Array.prototype.each = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.each requires first argument to be a function';
-
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
-    }
-
-    return null;
-  };
-}
-
 // Array.include
 if (!Array.prototype.include) {
   Array.prototype.include = function(arg) {
@@ -125,4 +108,20 @@ Liquid.extensions.arrayTools.flatten = function(array) {
   }
 
   return arr;
+};
+
+Liquid.extensions.arrayTools.each = function(obj, fun) {
+  var len = obj.length;
+  if (typeof fun != "function") {
+    throw 'Liquid.extensions.arrayTools.each requires first argument to be a function';
+  }
+
+  var thisp = arguments[2];
+  for (var i = 0; i < len; i++) {
+    if (i in obj) {
+      fun.call(thisp, obj[i], i, obj);
+    }
+  }
+
+  return null;
 };

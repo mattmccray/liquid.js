@@ -11,12 +11,12 @@ Liquid.Variable = Liquid.Class.extend({
       var filterMatches = markup.match(/\|\s*(.*)/);
       if(filterMatches) {
         var filters = filterMatches[1].split(/\|/);
-        filters.each(function(f){
+        Liquid.extensions.arrayTools.each(filters, function(f){
           var matches = f.match(/\s*(\w+)/);
           if(matches) {
             var filterName = matches[1];
             var filterArgs = [];
-            Liquid.extensions.arrayTools.flatten((f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || [])).each(function(arg){
+            Liquid.extensions.arrayTools.each(Liquid.extensions.arrayTools.flatten((f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || [])), function(arg){
               var cleanupMatch = arg.match(/^[\s|:|,]*(.*?)[\s]*$/);
               if(cleanupMatch)
                 { filterArgs.push( cleanupMatch[1] );}
@@ -31,7 +31,7 @@ Liquid.Variable = Liquid.Class.extend({
   render: function(context) {
     if(this.name == null){ return ''; }
     var output = context.get(this.name);
-    this.filters.each(function(filter) {
+    Liquid.extensions.arrayTools.each(this.filters, function(filter) {
       var filterName = filter[0],
           filterArgs = Liquid.extensions.arrayTools.map((filter[1] || []), function(arg){
             return context.get(arg);

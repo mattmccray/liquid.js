@@ -230,7 +230,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       var attrmarkup = markup.replace(this.tagSyntax, '');
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
           this.attributes[pair[0].strip()] = pair[1].strip();
         }, this);
@@ -277,7 +277,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
     context.stack(function(){
       var length = segment.length;
 
-      segment.each(function(item, index){
+      Liquid.extensions.arrayTools.each(segment, function(item, index){
         context.set( self.variableName, item );
         context.set( 'forloop', {
           name:   self.name,
@@ -391,7 +391,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
 
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
           this.attributes[pair[0].strip()] = pair[1].strip();
         }, this);
