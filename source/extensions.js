@@ -1,11 +1,3 @@
-// String.strip
-if (!String.prototype.strip) {
-  String.prototype.strip = function() {
-    return this.replace(/^\s+/, '').replace(/\s+$/, '');
-  };
-}
-
-
 // NOTE Having issues conflicting with jQuery stuff when setting Object 
 // prototype settings; instead add into Liquid.Object.extensions and use in 
 // the particular location; can add into Object.prototype later if we want.
@@ -47,7 +39,11 @@ Liquid.extensions.object.hasValue = function(arg) {
 
 Liquid.extensions.stringTools = {};
 Liquid.extensions.stringTools.capitalize = function(str) {
-  return str..charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+  return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+};
+
+Liquid.extensions.stringTools.strip = function(str) {
+  return str.replace(/^\s+/, '').replace(/\s+$/, '');
 };
 
 
