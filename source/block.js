@@ -67,7 +67,7 @@ Liquid.Block = Liquid.Tag.extend({
   },
   
   renderAll: function(list, context) {
-    return (list || []).map(function(token, i){
+    return Liquid.extensions.arrayTools.map((list || []), function(token, i){
       var output = '';
       try { // hmmm... feels a little heavy
         output = ( token['render'] ) ? token.render(context) : token;

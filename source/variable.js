@@ -33,7 +33,7 @@ Liquid.Variable = Liquid.Class.extend({
     var output = context.get(this.name);
     this.filters.each(function(filter) {
       var filterName = filter[0],
-          filterArgs = (filter[1] || []).map(function(arg){
+          filterArgs = Liquid.extensions.arrayTools.map((filter[1] || []), function(arg){
             return context.get(arg);
           });
       filterArgs.unshift(output); // Push in input value into the first argument spot...

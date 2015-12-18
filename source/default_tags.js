@@ -210,7 +210,7 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
   },
 
   variablesFromString: function(markup) {
-    return markup.split(',').map(function(varname){
+    return Liquid.extensions.arrayTools.map(markup.split(','), function(varname){
       var match = varname.match(/\s*("[^"]+"|'[^']+'|[^\s,|]+)\s*/);
       return (match[1]) ? match[1] : null
     });
@@ -416,7 +416,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
       })
 
       if(variable instanceof Array) {
-        output = variable.map(function(variable){
+        output = Liquid.extensions.arrayTools.map(variable, function(variable){
           context.set( self.templateNameVar, variable );
           return partial.render(context);
         });

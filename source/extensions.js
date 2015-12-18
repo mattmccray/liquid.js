@@ -1,21 +1,3 @@
-// Array.map
-if (!Array.prototype.map) {
-  Array.prototype.map = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.map requires first argument to be a function';
-
-    var res = new Array(len);
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        res[i] = fun.call(thisp, this[i], i, this);
-    }
-
-    return res;
-  };
-}
-
 // Array.flatten
 if (!Array.prototype.flatten) {
   Array.prototype.flatten = function() {
@@ -131,6 +113,19 @@ Liquid.extensions.arrayTools.indexOf = function(array, obj) {
   for (var i=0; i<array.length; i++) {
     if (array[i] == obj) return i;
   }
-
   return -1;
+};
+
+Liquid.extensions.arrayTools.map = function(obj, fun) {
+    var len = obj.length;
+    if (typeof fun != "function")
+      throw 'Liquid.extensions.arrayTools.map requires first argument to be a function';
+
+    var res = new Array(len);
+    var thisp = arguments[2];
+    for (var i = 0; i < len; i++) {
+      if (i in obj)
+        res[i] = fun.call(thisp, obj[i], i, obj);
+    }
+    return res;
 };
