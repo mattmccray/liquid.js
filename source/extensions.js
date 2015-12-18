@@ -1,15 +1,3 @@
-// Array.indexOf
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(obj) {
-    for (var i=0; i<this.length; i++) {
-      if (this[i] == obj) return i;
-    }
-    
-    return -1;
-  };
-}
-
-
 // Array.map
 if (!Array.prototype.map) {
   Array.prototype.map = function(fun /*, thisp*/) {
@@ -137,4 +125,12 @@ Liquid.extensions.arrayTools = {};
 
 Liquid.extensions.arrayTools.last = function(array) {
   return array[array.length - 1];
+};
+
+Liquid.extensions.arrayTools.indexOf = function(array, obj) {
+  for (var i=0; i<array.length; i++) {
+    if (array[i] == obj) return i;
+  }
+
+  return -1;
 };

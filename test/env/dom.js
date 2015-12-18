@@ -96,7 +96,7 @@ var window = this;
 		if ( !events[this.uuid][type] )
 			events[this.uuid][type] = [];
 		
-		if ( events[this.uuid][type].indexOf( fn ) < 0 )
+		if (Liquid.extensions.arrayTools.indexOf(events[this.uuid][type], fn) < 0 )
 			events[this.uuid][type].push( fn );
 	};
 	
