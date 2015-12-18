@@ -208,7 +208,7 @@ Liquid.Context = Liquid.Class.extend({
   },
   
   addFilters: function(filters) {
-    filters = filters.flatten();
+    filters = Liquid.extensions.arrayTools.flatten(filters);
     filters.each(function(f){
       if(!this._isObject(f)){ throw ("Expected object but got: "+ typeof(f)) }
       this.strainer.addMethods(f);

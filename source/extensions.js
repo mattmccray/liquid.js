@@ -1,23 +1,3 @@
-// Array.flatten
-if (!Array.prototype.flatten) {
-  Array.prototype.flatten = function() {
-    var len = this.length;
-    var arr = [];
-    for (var i = 0; i < len; i++) {
-      // TODO This supposedly isn't safe in multiple frames;
-      // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
-      // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
-      if (this[i] instanceof Array) {
-        arr = arr.concat(this[i]);
-      } else {
-        arr.push(this[i]);
-      }
-    }
-
-    return arr;
-  };
-}
-
 // Array.each
 if (!Array.prototype.each) {
   Array.prototype.each = function(fun /*, thisp*/) {
@@ -128,4 +108,21 @@ Liquid.extensions.arrayTools.map = function(obj, fun) {
         res[i] = fun.call(thisp, obj[i], i, obj);
     }
     return res;
+};
+
+Liquid.extensions.arrayTools.flatten = function(array) {
+  var len = array.length;
+  var arr = [];
+  for (var i = 0; i < len; i++) {
+    // TODO This supposedly isn't safe in multiple frames;
+    // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
+    // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
+    if (array[i] instanceof Array) {
+      arr = arr.concat(array[i]);
+    } else {
+      arr.push(array[i]);
+    }
+  }
+
+  return arr;
 };

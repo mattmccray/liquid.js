@@ -16,7 +16,7 @@ Liquid.Variable = Liquid.Class.extend({
           if(matches) {
             var filterName = matches[1];
             var filterArgs = [];
-            (f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || []).flatten().each(function(arg){
+            Liquid.extensions.arrayTools.flatten((f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || [])).each(function(arg){
               var cleanupMatch = arg.match(/^[\s|:|,]*(.*?)[\s]*$/);
               if(cleanupMatch)
                 { filterArgs.push( cleanupMatch[1] );}

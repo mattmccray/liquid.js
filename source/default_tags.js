@@ -52,7 +52,7 @@ Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    Liquid.extensions.arrayTools.last(context.scopes)[this.to] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -72,7 +72,7 @@ Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -117,11 +117,11 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
       for (var i=0; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.isElse  ) {
-          if(execElseBlock == true){ output = [output, self.renderAll(block.attachment, context)].flatten(); }
+          if(execElseBlock == true){ output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]); }
           return output;
         } else if( block.evaluate(context) ) {
           execElseBlock = false;
-          output = [output, self.renderAll(block.attachment, context)].flatten();
+          output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]);
         }
       };
     });
@@ -293,7 +293,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       });
     });
 
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
@@ -328,7 +328,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   },
 
   pushBlock: function(tag, markup) {
@@ -425,7 +425,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
         output = partial.render(context);
       }
     });
-    output = [output].flatten().join('');
+    output = Liquid.extensions.arrayTools.flatten([output]).join('');
     return output
   }
 }));
@@ -451,7 +451,7 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
