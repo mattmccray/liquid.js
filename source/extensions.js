@@ -1,18 +1,3 @@
-// Array.include
-if (!Array.prototype.include) {
-  Array.prototype.include = function(arg) {
-    var len = this.length;
-
-    return this.indexOf(arg) >= 0;
-    for (var i = 0; i < len; i++) {
-      if (arg == this[i]) return true;
-    }
-
-    return false;
-  };
-}
-
-
 // String.capitalize
 if (!String.prototype.capitalize) {
   String.prototype.capitalize = function() {
@@ -124,4 +109,15 @@ Liquid.extensions.arrayTools.each = function(obj, fun) {
   }
 
   return null;
+};
+
+Liquid.extensions.arrayTools.include = function(array, arg) {
+  var len = array.length;
+
+  return Liquid.extensions.arrayTools.indexOf(array, arg) >= 0;
+  for (var i = 0; i < len; i++) {
+    if (arg == array[i]) return true;
+  }
+
+  return false;
 };

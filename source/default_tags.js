@@ -309,7 +309,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
   },
 
   unknownTag: function(tag, markup, tokens) {
-    if( ['elsif', 'else'].include(tag) ) {
+    if( Liquid.extensions.arrayTools.include(['elsif', 'else'], tag) ) {
       this.pushBlock(tag, markup);
     } else {
       this._super(tag, markup, tokens);

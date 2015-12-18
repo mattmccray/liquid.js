@@ -7,7 +7,7 @@ Liquid.Strainer = Liquid.Class.extend({
   respondTo: function(methodName) {
     methodName = methodName.toString();
     if (methodName.match(/^__/)) return false;
-    if (Liquid.Strainer.requiredMethods.include(methodName)) return false;
+    if (Liquid.extensions.arrayTools.include(Liquid.Strainer.requiredMethods, methodName)) return false;
     return (methodName in this);
   }
 });
