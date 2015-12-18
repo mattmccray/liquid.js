@@ -17,97 +17,6 @@ var Liquid = {
 
 };
 
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(obj) {
-    for (var i=0; i<this.length; i++) {
-      if (this[i] == obj) return i;
-    }
-
-    return -1;
-  };
-}
-
-if (!Array.prototype.clear) {
-  Array.prototype.clear = function() {
-    this.length = 0;
-  };
-}
-
-if (!Array.prototype.map) {
-  Array.prototype.map = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.map requires first argument to be a function';
-
-    var res = new Array(len);
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        res[i] = fun.call(thisp, this[i], i, this);
-    }
-
-    return res;
-  };
-}
-
-if (!Array.prototype.first) {
-  Array.prototype.first = function() {
-    return this[0];
-  };
-}
-
-if (!Array.prototype.last) {
-  Array.prototype.last = function() {
-    return this[this.length - 1];
-  };
-}
-
-if (!Array.prototype.flatten) {
-  Array.prototype.flatten = function() {
-    var len = this.length;
-    var arr = [];
-    for (var i = 0; i < len; i++) {
-      if (this[i] instanceof Array) {
-        arr = arr.concat(this[i]);
-      } else {
-        arr.push(this[i]);
-      }
-    }
-
-    return arr;
-  };
-}
-
-if (!Array.prototype.each) {
-  Array.prototype.each = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.each requires first argument to be a function';
-
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
-    }
-
-    return null;
-  };
-}
-
-if (!Array.prototype.include) {
-  Array.prototype.include = function(arg) {
-    var len = this.length;
-
-    return this.indexOf(arg) >= 0;
-    for (var i = 0; i < len; i++) {
-      if (arg == this[i]) return true;
-    }
-
-    return false;
-  };
-}
-
-
 if (!String.prototype.capitalize) {
   String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
@@ -144,6 +53,73 @@ Liquid.extensions.object.hasValue = function(arg) {
   return false;
 };
 
+Liquid.extensions.arrayTools = {};
+
+Liquid.extensions.arrayTools.last = function(array) {
+  return array[array.length - 1];
+};
+
+Liquid.extensions.arrayTools.indexOf = function(array, obj) {
+  for (var i=0; i<array.length; i++) {
+    if (array[i] == obj) return i;
+  }
+  return -1;
+};
+
+Liquid.extensions.arrayTools.map = function(obj, fun) {
+    var len = obj.length;
+    if (typeof fun != "function")
+      throw 'Liquid.extensions.arrayTools.map requires first argument to be a function';
+
+    var res = new Array(len);
+    var thisp = arguments[2];
+    for (var i = 0; i < len; i++) {
+      if (i in obj)
+        res[i] = fun.call(thisp, obj[i], i, obj);
+    }
+    return res;
+};
+
+Liquid.extensions.arrayTools.flatten = function(array) {
+  var len = array.length;
+  var arr = [];
+  for (var i = 0; i < len; i++) {
+    if (array[i] instanceof Array) {
+      arr = arr.concat(array[i]);
+    } else {
+      arr.push(array[i]);
+    }
+  }
+
+  return arr;
+};
+
+Liquid.extensions.arrayTools.each = function(obj, fun) {
+  var len = obj.length;
+  if (typeof fun != "function") {
+    throw 'Liquid.extensions.arrayTools.each requires first argument to be a function';
+  }
+
+  var thisp = arguments[2];
+  for (var i = 0; i < len; i++) {
+    if (i in obj) {
+      fun.call(thisp, obj[i], i, obj);
+    }
+  }
+
+  return null;
+};
+
+Liquid.extensions.arrayTools.include = function(array, arg) {
+  var len = array.length;
+
+  return Liquid.extensions.arrayTools.indexOf(array, arg) >= 0;
+  for (var i = 0; i < len; i++) {
+    if (arg == array[i]) return true;
+  }
+
+  return false;
+};
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
@@ -220,7 +196,7 @@ Liquid.Block = Liquid.Tag.extend({
 
   parse: function(tokens) {
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
 
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...
@@ -274,7 +250,7 @@ Liquid.Block = Liquid.Tag.extend({
   },
 
   renderAll: function(list, context) {
-    return (list || []).map(function(token, i){
+    return Liquid.extensions.arrayTools.map((list || []), function(token, i){
       var output = '';
       try { // hmmm... feels a little heavy
         output = ( token['render'] ) ? token.render(context) : token;
@@ -308,7 +284,7 @@ Liquid.Strainer = Liquid.Class.extend({
   respondTo: function(methodName) {
     methodName = methodName.toString();
     if (methodName.match(/^__/)) return false;
-    if (Liquid.Strainer.requiredMethods.include(methodName)) return false;
+    if (Liquid.extensions.arrayTools.include(Liquid.Strainer.requiredMethods, methodName)) return false;
     return (methodName in this);
   }
 });
@@ -478,7 +454,7 @@ Liquid.Context = Liquid.Class.extend({
         self = this;
 
     if(object) {
-      parts.each(function(part){
+      Liquid.extensions.arrayTools.each(parts, function(part){
         var squareMatch = part.match(/^\[(.*)\]$/);
         if(squareMatch) {
           var part = self.resolve( squareMatch[1] );
@@ -498,7 +474,7 @@ Liquid.Context = Liquid.Class.extend({
             if(self._isObject(object) && self._isObject(object[pos]) && ('toLiquid' in object[pos])) { object = object[pos].toLiquid(); }
             else { object  = object[pos]; }
           }
-          else if( object && typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
+          else if( object && typeof(object[part]) == 'function' && Liquid.extensions.arrayTools.include(['length', 'size', 'first', 'last'], part) ) {
             object = object[part].apply(part);
             if('toLiquid' in object){ object = object.toLiquid(); }
           }
@@ -513,8 +489,8 @@ Liquid.Context = Liquid.Class.extend({
   },
 
   addFilters: function(filters) {
-    filters = filters.flatten();
-    filters.each(function(f){
+    filters = Liquid.extensions.arrayTools.flatten(filters);
+    Liquid.extensions.arrayTools.each(filters, function(f){
       if(!this._isObject(f)){ throw ("Expected object but got: "+ typeof(f)) }
       this.strainer.addMethods(f);
     });
@@ -621,12 +597,12 @@ Liquid.Variable = Liquid.Class.extend({
       var filterMatches = markup.match(/\|\s*(.*)/);
       if(filterMatches) {
         var filters = filterMatches[1].split(/\|/);
-        filters.each(function(f){
+        Liquid.extensions.arrayTools.each(filters, function(f){
           var matches = f.match(/\s*(\w+)/);
           if(matches) {
             var filterName = matches[1];
             var filterArgs = [];
-            (f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || []).flatten().each(function(arg){
+            Liquid.extensions.arrayTools.each(Liquid.extensions.arrayTools.flatten((f.match(/(?:[:|,]\s*)("[^"]+"|'[^']+'|[^\s,|]+)/g) || [])), function(arg){
               var cleanupMatch = arg.match(/^[\s|:|,]*(.*?)[\s]*$/);
               if(cleanupMatch)
                 { filterArgs.push( cleanupMatch[1] );}
@@ -641,9 +617,9 @@ Liquid.Variable = Liquid.Class.extend({
   render: function(context) {
     if(this.name == null){ return ''; }
     var output = context.get(this.name);
-    this.filters.each(function(filter) {
+    Liquid.extensions.arrayTools.each(this.filters, function(filter) {
       var filterName = filter[0],
-          filterArgs = (filter[1] || []).map(function(arg){
+          filterArgs = Liquid.extensions.arrayTools.map((filter[1] || []), function(arg){
             return context.get(arg);
           });
       filterArgs.unshift(output); // Push in input value into the first argument spot...
@@ -726,7 +702,7 @@ Liquid.Condition.operators = {
 
   'contains': function(l,r) {
     if ( Object.prototype.toString.call(l) === '[object Array]' ) {
-      return l.indexOf(r) >= 0;
+      return Liquid.extensions.arrayTools.indexOf(l, r) >= 0;
     } else {
       return l.match(r);
     }
@@ -798,7 +774,7 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
   },
   render: function(context) {
     var value = new Liquid.Variable(this.from);
-    context.scopes.last()[this.to.toString()] = value.render(context);
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = value.render(context);
     return '';
   }
 }));
@@ -817,7 +793,7 @@ Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -837,7 +813,7 @@ Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to.toString()] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -882,11 +858,11 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
       for (var i=0; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.isElse  ) {
-          if(execElseBlock == true){ output = [output, self.renderAll(block.attachment, context)].flatten(); }
+          if(execElseBlock == true){ output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]); }
           return output;
         } else if( block.evaluate(context) ) {
           execElseBlock = false;
-          output = [output, self.renderAll(block.attachment, context)].flatten();
+          output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]);
         }
       };
     });
@@ -972,7 +948,7 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
   },
 
   variablesFromString: function(markup) {
-    return markup.split(',').map(function(varname){
+    return Liquid.extensions.arrayTools.map(markup.split(','), function(varname){
       var match = varname.match(/\s*("[^"]+"|'[^']+'|[^\s,|]+)\s*/);
       return (match[1]) ? match[1] : null
     });
@@ -992,7 +968,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       var attrmarkup = markup.replace(this.tagSyntax, '');
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
           this.attributes[pair[0].strip()] = pair[1].strip();
         }, this);
@@ -1036,7 +1012,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
     context.stack(function(){
       var length = segment.length;
 
-      segment.each(function(item, index){
+      Liquid.extensions.arrayTools.each(segment, function(item, index){
         context.set( self.variableName, item );
         context.set( 'forloop', {
           name:   self.name,
@@ -1052,7 +1028,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       });
     });
 
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
@@ -1068,7 +1044,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
   },
 
   unknownTag: function(tag, markup, tokens) {
-    if( ['elsif', 'else'].include(tag) ) {
+    if( Liquid.extensions.arrayTools.include(['elsif', 'else'], tag) ) {
       this.pushBlock(tag, markup);
     } else {
       this._super(tag, markup, tokens);
@@ -1087,7 +1063,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   },
 
   pushBlock: function(tag, markup) {
@@ -1150,7 +1126,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
 
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
           this.attributes[pair[0].strip()] = pair[1].strip();
         }, this);
@@ -1174,7 +1150,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
       })
 
       if(variable instanceof Array) {
-        output = variable.map(function(variable){
+        output = Liquid.extensions.arrayTools.map(variable, function(variable){
           context.set( self.templateNameVar, variable );
           return partial.render(context);
         });
@@ -1183,7 +1159,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
         output = partial.render(context);
       }
     });
-    output = [output].flatten().join('');
+    output = Liquid.extensions.arrayTools.flatten([output]).join('');
     return output
   }
 }));
@@ -1207,14 +1183,14 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
 Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
   parse: function(tokens) {
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
 
     var token = tokens.shift();
     tokens.push('');

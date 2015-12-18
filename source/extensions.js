@@ -1,113 +1,3 @@
-// Array.indexOf
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(obj) {
-    for (var i=0; i<this.length; i++) {
-      if (this[i] == obj) return i;
-    }
-    
-    return -1;
-  };
-}
-
-// Array.clear
-if (!Array.prototype.clear) {
-  Array.prototype.clear = function() {
-    //while (this.length > 0) this.pop();
-    this.length = 0;
-  };
-}
-
-// Array.map
-if (!Array.prototype.map) {
-  Array.prototype.map = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.map requires first argument to be a function';
-
-    var res = new Array(len);
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        res[i] = fun.call(thisp, this[i], i, this);
-    }
-
-    return res;
-  };
-}
-
-// Array.first
-if (!Array.prototype.first) {
-  Array.prototype.first = function() {
-    return this[0];
-  };
-}
-
-// Array.last
-if (!Array.prototype.last) {
-  Array.prototype.last = function() {
-    return this[this.length - 1];
-  };
-}
-
-// Array.flatten
-if (!Array.prototype.flatten) {
-  Array.prototype.flatten = function() {
-    var len = this.length;
-    var arr = [];
-    for (var i = 0; i < len; i++) {
-      // TODO This supposedly isn't safe in multiple frames;
-      // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
-      // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
-      if (this[i] instanceof Array) {
-        arr = arr.concat(this[i]);
-      } else {
-        arr.push(this[i]);
-      }
-    }
-
-    return arr;
-  };
-}
-
-// Array.each
-if (!Array.prototype.each) {
-  Array.prototype.each = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.each requires first argument to be a function';
-
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
-    }
-
-    return null;
-  };
-}
-
-// Array.include
-if (!Array.prototype.include) {
-  Array.prototype.include = function(arg) {
-    var len = this.length;
-
-    return this.indexOf(arg) >= 0;
-    for (var i = 0; i < len; i++) {
-      if (arg == this[i]) return true;
-    }
-
-    return false;
-  };
-}
-
-
-// String.capitalize
-if (!String.prototype.capitalize) {
-  String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
-  };
-}
-
 // String.strip
 if (!String.prototype.strip) {
   String.prototype.strip = function() {
@@ -153,4 +43,81 @@ Liquid.extensions.object.hasValue = function(arg) {
 //if (!Object.prototype.hasValue) {
 //  Object.prototype.hasValue = Liquid.extensions.object.hasValue
 //}
+//
 
+Liquid.extensions.stringTools = {};
+Liquid.extensions.stringTools.capitalize = function(str) {
+  return str..charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+};
+
+
+Liquid.extensions.arrayTools = {};
+
+Liquid.extensions.arrayTools.last = function(array) {
+  return array[array.length - 1];
+};
+
+Liquid.extensions.arrayTools.indexOf = function(array, obj) {
+  for (var i=0; i<array.length; i++) {
+    if (array[i] == obj) return i;
+  }
+  return -1;
+};
+
+Liquid.extensions.arrayTools.map = function(obj, fun) {
+    var len = obj.length;
+    if (typeof fun != "function")
+      throw 'Liquid.extensions.arrayTools.map requires first argument to be a function';
+
+    var res = new Array(len);
+    var thisp = arguments[2];
+    for (var i = 0; i < len; i++) {
+      if (i in obj)
+        res[i] = fun.call(thisp, obj[i], i, obj);
+    }
+    return res;
+};
+
+Liquid.extensions.arrayTools.flatten = function(array) {
+  var len = array.length;
+  var arr = [];
+  for (var i = 0; i < len; i++) {
+    // TODO This supposedly isn't safe in multiple frames;
+    // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
+    // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
+    if (array[i] instanceof Array) {
+      arr = arr.concat(array[i]);
+    } else {
+      arr.push(array[i]);
+    }
+  }
+
+  return arr;
+};
+
+Liquid.extensions.arrayTools.each = function(obj, fun) {
+  var len = obj.length;
+  if (typeof fun != "function") {
+    throw 'Liquid.extensions.arrayTools.each requires first argument to be a function';
+  }
+
+  var thisp = arguments[2];
+  for (var i = 0; i < len; i++) {
+    if (i in obj) {
+      fun.call(thisp, obj[i], i, obj);
+    }
+  }
+
+  return null;
+};
+
+Liquid.extensions.arrayTools.include = function(array, arg) {
+  var len = array.length;
+
+  return Liquid.extensions.arrayTools.indexOf(array, arg) >= 0;
+  for (var i = 0; i < len; i++) {
+    if (arg == array[i]) return true;
+  }
+
+  return false;
+};
