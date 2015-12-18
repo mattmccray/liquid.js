@@ -28,13 +28,6 @@ if (!Array.prototype.map) {
   };
 }
 
-// Array.first
-if (!Array.prototype.first) {
-  Array.prototype.first = function() {
-    return this[0];
-  };
-}
-
 // Array.last
 if (!Array.prototype.last) {
   Array.prototype.last = function() {
