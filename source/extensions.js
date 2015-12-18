@@ -1,10 +1,3 @@
-// String.capitalize
-if (!String.prototype.capitalize) {
-  String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
-  };
-}
-
 // String.strip
 if (!String.prototype.strip) {
   String.prototype.strip = function() {
@@ -50,6 +43,13 @@ Liquid.extensions.object.hasValue = function(arg) {
 //if (!Object.prototype.hasValue) {
 //  Object.prototype.hasValue = Liquid.extensions.object.hasValue
 //}
+//
+
+Liquid.extensions.stringTools = {};
+Liquid.extensions.stringTools.capitalize = function(str) {
+  return str..charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+};
+
 
 Liquid.extensions.arrayTools = {};
 

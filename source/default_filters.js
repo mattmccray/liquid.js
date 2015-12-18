@@ -22,7 +22,7 @@ Liquid.Template.registerFilter({
   },
   
   capitalize: function(input) {
-    return input.toString().capitalize();
+    return Liquid.extensions.stringTools.capitalize(input.toString());
   },
   
   escape: function(input) {
