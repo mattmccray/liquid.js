@@ -26,23 +26,23 @@ h2. Differences
 # 'include' tag. By default, this will return a Liquid error (but not an exception). To use the 'include' tag, you'll need to implement your own 'filesystem' support. Which, in Liquid.js, just means you override the Liquid.readTemplateFile function to suit your own needs. Here's an example:
 
 <pre><script>
-  
+
   Liquid.readTemplateFile = function(path) {
     var elem = $(path);
     if(elem) {
       return elem.innerHTML;
     } else {
-      return path +" can't be found."; 
+      return path +" can't be found.";
       // Or throw and error, or whatever you want...
     }
   }
-  
+
   var src = "{% include 'myOtherTemplate' with current_user %}";
 
   var tmpl = Liquid.parse( src );
-  
+
   alert( tmpl.render({ current_user:'M@' }));
-  
+
 </script>
 <!-- Browsers ignore script blocks with an unrecognized type.  -->
 <!-- Makes for pretty good inline template storage.  -->
@@ -68,7 +68,7 @@ h2. Development
 
 h3. Todo
 
-* Add Rhino support for console-based testing?
+* Add support for console-based testing?
 * Move the Class OOP support (that replaced Prototype) into Liquid.Class so it won't conflict with other implementations.
 * Look at the Object extensions and consider making a Liquid.Hash class similar to Prototype.
 * Look into making into a gem or something that has the auto-compiled JS file in the workflow somewhere.

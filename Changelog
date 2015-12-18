@@ -1,3 +1,10 @@
+1.3.2 / 2015-04-27
+==================
+
+* Don't leak global variables inside a closure
+* Don't add Liquid to `this` when not using exports
+* Define Class on Liquid instead of window
+* Proper library export
 
 1.3.0 / 2014-10-13
 ==================
