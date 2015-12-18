@@ -28,13 +28,6 @@ if (!Array.prototype.map) {
   };
 }
 
-// Array.last
-if (!Array.prototype.last) {
-  Array.prototype.last = function() {
-    return this[this.length - 1];
-  };
-}
-
 // Array.flatten
 if (!Array.prototype.flatten) {
   Array.prototype.flatten = function() {
@@ -140,3 +133,8 @@ Liquid.extensions.object.hasValue = function(arg) {
 //  Object.prototype.hasValue = Liquid.extensions.object.hasValue
 //}
 
+Liquid.extensions.arrayTools = {};
+
+Liquid.extensions.arrayTools.last = function(array) {
+  return array[array.length - 1];
+};

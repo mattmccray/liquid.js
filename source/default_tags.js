@@ -32,7 +32,7 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
   },
   render: function(context) {
     var value = new Liquid.Variable(this.from);
-    context.scopes.last()[this.to.toString()] = value.render(context);
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = value.render(context);
     return '';
   }
 }));
@@ -52,7 +52,7 @@ Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to] = [output].flatten().join('');
     return '';
   }
 }));
@@ -72,7 +72,7 @@ Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to.toString()] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = [output].flatten().join('');
     return '';
   }
 }));
