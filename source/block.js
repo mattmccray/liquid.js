@@ -11,7 +11,7 @@ Liquid.Block = Liquid.Tag.extend({
     // share this through pointers; specifically If points _nodelist at the 
     // blocks attachment, so we need to leave that pointer to pickup stuff.
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
     
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...

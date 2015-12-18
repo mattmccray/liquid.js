@@ -460,7 +460,7 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
   // to render directly (rather than parsing them) until we reach {% endraw %}
   parse: function(tokens) {
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
 
     var token = tokens.shift();
     tokens.push('');

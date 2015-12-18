@@ -9,13 +9,6 @@ if (!Array.prototype.indexOf) {
   };
 }
 
-// Array.clear
-if (!Array.prototype.clear) {
-  Array.prototype.clear = function() {
-    //while (this.length > 0) this.pop();
-    this.length = 0;
-  };
-}
 
 // Array.map
 if (!Array.prototype.map) {
