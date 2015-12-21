@@ -1,105 +1,127 @@
 // Array.indexOf
 if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(obj) {
-    for (var i=0; i<this.length; i++) {
-      if (this[i] == obj) return i;
+  Object.defineProperty(Array.prototype, 'indexOf', {
+    enumerable: false,
+    value: function(obj) {
+      for (var i=0; i<this.length; i++) {
+        if (this[i] == obj) return i;
+      }
+
+      return -1;
     }
-    
-    return -1;
-  };
+  });
 }
 
 // Array.clear
 if (!Array.prototype.clear) {
-  Array.prototype.clear = function() {
-    //while (this.length > 0) this.pop();
-    this.length = 0;
-  };
+  Object.defineProperty(Array.prototype, 'clear', {
+    enumerable: false,
+    value: function() {
+      this.length = 0;
+    }
+  });
 }
 
 // Array.map
 if (!Array.prototype.map) {
-  Array.prototype.map = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.map requires first argument to be a function';
+  Object.defineProperty(Array.prototype, 'map', {
+    enumerable: false,
+    value: function(fun /*, thisp*/) {
+      var len = this.length;
+      if (typeof fun != "function")
+        throw 'Array.map requires first argument to be a function';
 
-    var res = new Array(len);
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        res[i] = fun.call(thisp, this[i], i, this);
+      var res = new Array(len);
+      var thisp = arguments[1];
+      for (var i = 0; i < len; i++) {
+        if (i in this)
+          res[i] = fun.call(thisp, this[i], i, this);
+      }
+
+      return res;
     }
-
-    return res;
-  };
+  });
 }
 
 // Array.first
 if (!Array.prototype.first) {
-  Array.prototype.first = function() {
-    return this[0];
-  };
+  Object.defineProperty(Array.prototype, 'first', {
+    enumerable: false,
+    value: function() {
+      return this[0];
+    }
+  });
 }
 
 // Array.last
 if (!Array.prototype.last) {
-  Array.prototype.last = function() {
-    return this[this.length - 1];
-  };
+  Object.defineProperty(Array.prototype, 'last', {
+    enumerable: false,
+    value: function() {
+      return this[this.length - 1];
+    }
+  });
 }
 
 // Array.flatten
 if (!Array.prototype.flatten) {
-  Array.prototype.flatten = function() {
-    var len = this.length;
-    var arr = [];
-    for (var i = 0; i < len; i++) {
-      // TODO This supposedly isn't safe in multiple frames;
-      // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
-      // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
-      if (this[i] instanceof Array) {
-        arr = arr.concat(this[i]);
-      } else {
-        arr.push(this[i]);
+  Object.defineProperty(Array.prototype, 'flatten', {
+    enumerable: false,
+    value: function() {
+      var len = this.length;
+      var arr = [];
+      for (var i = 0; i < len; i++) {
+        // TODO This supposedly isn't safe in multiple frames;
+        // http://stackoverflow.com/questions/767486/how-do-you-check-if-a-variable-is-an-array-in-javascript
+        // http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
+        if (this[i] instanceof Array) {
+          arr = arr.concat(this[i]);
+        } else {
+          arr.push(this[i]);
+        }
       }
-    }
 
-    return arr;
-  };
+      return arr;
+    }
+  });
 }
 
 // Array.each
 if (!Array.prototype.each) {
-  Array.prototype.each = function(fun /*, thisp*/) {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw 'Array.each requires first argument to be a function';
+  Object.defineProperty(Array.prototype, 'each', {
+    enumerable: false,
+    value: function(fun /*, thisp*/) {
+      var len = this.length;
+      if (typeof fun != "function")
+        throw 'Array.each requires first argument to be a function';
 
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++) {
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
+      var thisp = arguments[1];
+      for (var i = 0; i < len; i++) {
+        if (i in this)
+          fun.call(thisp, this[i], i, this);
+      }
+
+      return null;
     }
-
-    return null;
-  };
+  });
 }
 
 // Array.include
 if (!Array.prototype.include) {
-  Array.prototype.include = function(arg) {
-    var len = this.length;
+  Object.defineProperty(Array.prototype, 'include', {
+    enumerable: false,
+    value: function(arg) {
+      var len = this.length;
 
-    return this.indexOf(arg) >= 0;
-    for (var i = 0; i < len; i++) {
-      if (arg == this[i]) return true;
+      return this.indexOf(arg) >= 0;
+      for (var i = 0; i < len; i++) {
+        if (arg == this[i]) return true;
+      }
+
+      return false;
     }
-
-    return false;
-  };
+  });
 }
-
 
 // String.capitalize
 if (!String.prototype.capitalize) {
@@ -116,8 +138,8 @@ if (!String.prototype.strip) {
 }
 
 
-// NOTE Having issues conflicting with jQuery stuff when setting Object 
-// prototype settings; instead add into Liquid.Object.extensions and use in 
+// NOTE Having issues conflicting with jQuery stuff when setting Object
+// prototype settings; instead add into Liquid.Object.extensions and use in
 // the particular location; can add into Object.prototype later if we want.
 Liquid.extensions = {};
 Liquid.extensions.object = {};
@@ -153,4 +175,3 @@ Liquid.extensions.object.hasValue = function(arg) {
 //if (!Object.prototype.hasValue) {
 //  Object.prototype.hasValue = Liquid.extensions.object.hasValue
 //}
-
