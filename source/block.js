@@ -11,7 +11,7 @@ Liquid.Block = Liquid.Tag.extend({
     // share this through pointers; specifically If points _nodelist at the 
     // blocks attachment, so we need to leave that pointer to pickup stuff.
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
     
     var token = tokens.shift();
     tokens.push(''); // To ensure we don't lose the last token passed in...
@@ -67,7 +67,7 @@ Liquid.Block = Liquid.Tag.extend({
   },
   
   renderAll: function(list, context) {
-    return (list || []).map(function(token, i){
+    return Liquid.extensions.arrayTools.map((list || []), function(token, i){
       var output = '';
       try { // hmmm... feels a little heavy
         output = ( token['render'] ) ? token.render(context) : token;

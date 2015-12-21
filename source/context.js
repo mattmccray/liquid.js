@@ -164,7 +164,7 @@ Liquid.Context = Liquid.Class.extend({
 
     // Does 'pos' need to be scoped up here?
     if(object) {
-      parts.each(function(part){
+      Liquid.extensions.arrayTools.each(parts, function(part){
         // If object is a hash we look for the presence of the key and if its available we return it
         var squareMatch = part.match(/^\[(.*)\]$/);
         if(squareMatch) {
@@ -191,7 +191,7 @@ Liquid.Context = Liquid.Class.extend({
           }
           // Some special cases. If no key with the same name was found we interpret following calls
           // as commands and call them on the current object if it exists
-          else if( object && typeof(object[part]) == 'function' && ['length', 'size', 'first', 'last'].include(part) ) {
+          else if( object && typeof(object[part]) == 'function' && Liquid.extensions.arrayTools.include(['length', 'size', 'first', 'last'], part) ) {
             object = object[part].apply(part);
             if('toLiquid' in object){ object = object.toLiquid(); }
           }
@@ -208,8 +208,8 @@ Liquid.Context = Liquid.Class.extend({
   },
   
   addFilters: function(filters) {
-    filters = filters.flatten();
-    filters.each(function(f){
+    filters = Liquid.extensions.arrayTools.flatten(filters);
+    Liquid.extensions.arrayTools.each(filters, function(f){
       if(!this._isObject(f)){ throw ("Expected object but got: "+ typeof(f)) }
       this.strainer.addMethods(f);
     });

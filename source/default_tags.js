@@ -32,7 +32,7 @@ Liquid.Template.registerTag( 'assign', Liquid.Tag.extend({
   },
   render: function(context) {
     var value = new Liquid.Variable(this.from);
-    context.scopes.last()[this.to.toString()] = value.render(context);
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = value.render(context);
     return '';
   }
 }));
@@ -52,7 +52,7 @@ Liquid.Template.registerTag( 'cache', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -72,7 +72,7 @@ Liquid.Template.registerTag( 'capture', Liquid.Block.extend({
   },
   render: function(context) {
     var output = this._super(context);
-    context.scopes.last()[this.to.toString()] = [output].flatten().join('');
+    Liquid.extensions.arrayTools.last(context.scopes)[this.to.toString()] = Liquid.extensions.arrayTools.flatten([output]).join('');
     return '';
   }
 }));
@@ -117,11 +117,11 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
       for (var i=0; i < self.blocks.length; i++) {
         var block = self.blocks[i];
         if( block.isElse  ) {
-          if(execElseBlock == true){ output = [output, self.renderAll(block.attachment, context)].flatten(); }
+          if(execElseBlock == true){ output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]); }
           return output;
         } else if( block.evaluate(context) ) {
           execElseBlock = false;
-          output = [output, self.renderAll(block.attachment, context)].flatten();
+          output = Liquid.extensions.arrayTools.flatten([output, self.renderAll(block.attachment, context)]);
         }
       };
     });
@@ -143,7 +143,7 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
     }
   },
   recordElseCondition: function(markup) {
-    if( (markup || '').strip() != '') {
+    if( Liquid.extensions.stringTools.strip((markup || '')) != '') {
       throw ("Syntax error in tag 'case' - Valid else condition: {% else %} (no parameters) ")
     }
     var block = new Liquid.ElseCondition();
@@ -210,7 +210,7 @@ Liquid.Template.registerTag( 'cycle', Liquid.Tag.extend({
   },
 
   variablesFromString: function(markup) {
-    return markup.split(',').map(function(varname){
+    return Liquid.extensions.arrayTools.map(markup.split(','), function(varname){
       var match = varname.match(/\s*("[^"]+"|'[^']+'|[^\s,|]+)\s*/);
       return (match[1]) ? match[1] : null
     });
@@ -230,9 +230,9 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       var attrmarkup = markup.replace(this.tagSyntax, '');
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
-          this.attributes[pair[0].strip()] = pair[1].strip();
+          this.attributes[Liquid.extensions.stringTools.strip(pair[0])] = Liquid.extensions.stringTools.strip(pair[1]);
         }, this);
       }
     } else {
@@ -277,7 +277,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
     context.stack(function(){
       var length = segment.length;
 
-      segment.each(function(item, index){
+      Liquid.extensions.arrayTools.each(segment, function(item, index){
         context.set( self.variableName, item );
         context.set( 'forloop', {
           name:   self.name,
@@ -293,7 +293,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       });
     });
 
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
@@ -309,7 +309,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
   },
 
   unknownTag: function(tag, markup, tokens) {
-    if( ['elsif', 'else'].include(tag) ) {
+    if( Liquid.extensions.arrayTools.include(['elsif', 'else'], tag) ) {
       this.pushBlock(tag, markup);
     } else {
       this._super(tag, markup, tokens);
@@ -328,7 +328,7 @@ Liquid.Template.registerTag( 'if', Liquid.Block.extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   },
 
   pushBlock: function(tag, markup) {
@@ -391,9 +391,9 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
 
       var attMatchs = markup.match(/(\w*?)\s*\:\s*("[^"]+"|'[^']+'|[^\s,|]+)/g);
       if(attMatchs) {
-        attMatchs.each(function(pair){
+        Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
-          this.attributes[pair[0].strip()] = pair[1].strip();
+          this.attributes[Liquid.extensions.stringTools.strip(pair[0])] = Liquid.extensions.stringTools.strip(pair[1]);
         }, this);
       }
     } else {
@@ -416,7 +416,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
       })
 
       if(variable instanceof Array) {
-        output = variable.map(function(variable){
+        output = Liquid.extensions.arrayTools.map(variable, function(variable){
           context.set( self.templateNameVar, variable );
           return partial.render(context);
         });
@@ -425,7 +425,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
         output = partial.render(context);
       }
     });
-    output = [output].flatten().join('');
+    output = Liquid.extensions.arrayTools.flatten([output]).join('');
     return output
   }
 }));
@@ -451,7 +451,7 @@ Liquid.Template.registerTag( 'unless', Liquid.Template.tags['if'].extend({
         }
       };
     })
-    return [output].flatten().join('');
+    return Liquid.extensions.arrayTools.flatten([output]).join('');
   }
 }));
 
@@ -460,7 +460,7 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
   // to render directly (rather than parsing them) until we reach {% endraw %}
   parse: function(tokens) {
     if (!this.nodelist) this.nodelist = [];
-    this.nodelist.clear();
+    this.nodelist.length = 0;
 
     var token = tokens.shift();
     tokens.push('');
