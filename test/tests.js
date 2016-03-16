@@ -104,6 +104,16 @@ var Tests = (function() {
       assertEqual( 'this &amp; &quot;that&quot;', render("{{ 'this & \"that\"' | escape }}")  )
     },
 
+    '{{ * | default }}': function() {
+      assertEqual( "foo", render("{{ foo | default: 'bar' }}", { foo: "foo" }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: null }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: undefined }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: "" }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: false }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: [] }))
+      assertEqual( "bar", render("{{ foo | default: 'bar' }}", { foo: {} }))
+      assertEqual( "5", render("{{ foo | default: 'bar' }}", { foo: 5 }))
+    },
 
     '{{ string | truncate }}': function() {
       assertEqual(
