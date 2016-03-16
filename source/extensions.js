@@ -32,6 +32,16 @@ Liquid.extensions.object.hasValue = function(arg) {
 
   return false;
 };
+
+Liquid.extensions.object.isEmpty = function(obj) {
+  if (!obj || Liquid.extensions.stringTools.strip(obj.toString()) === "") return true;
+  if (obj.length && obj.length > 0) return false;
+  if (typeof obj === 'number') return false;
+
+  for (var prop in obj) if (obj[prop]) return false;
+  return true;
+};
+
 //if (!Object.prototype.hasValue) {
 //  Object.prototype.hasValue = Liquid.extensions.object.hasValue
 //}

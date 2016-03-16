@@ -38,7 +38,11 @@ Liquid.Template.registerFilter({
       return self._HTML_ESCAPE_MAP[chr];
     });
   },
-  
+
+  default: function(input, default_value) {
+    return Liquid.extensions.object.isEmpty(input) ? default_value : input;
+  },
+
   truncate: function(input, length, string) {
     if(!input || input == ''){ return ''; }
     length = length || 50;
