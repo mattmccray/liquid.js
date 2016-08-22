@@ -383,11 +383,11 @@ var Tests = (function() {
       var src = "{% capture myContent %}Good 'old content!{% endcapture %}Before {{ myContent }}";
       assertEqual("Before Good 'old content!", Liquid.parse(src).render());
     },
-    
+
     "{% capture varname %}{% endcapture %}{% for i in collection %}{% capture varname %}{{ varname }}{% endcapture %}{% endfor %}": function () {
       var src = "{% for i in (1..3) %}{% capture varname %}{{ varname }}[{{ i }}]{% endcapture %}{% endfor %}.{{ varname }}.";
       assertEqual(".[1][2][3].", Liquid.parse(src).render());
-      
+
       var src = "{% capture varname %}{% endcapture %}{% for i in (1..3) %}{% capture varname %}{{ varname }}[{{ i }}]{% endcapture %}{% endfor %}.{{ varname }}.";
       assertEqual(".[1][2][3].", Liquid.parse(src).render());
     },
@@ -491,6 +491,20 @@ var Tests = (function() {
 
       var postRaw = "{% raw %}" + rawText + "{% endraw %}{% if true %}{{ var }}{% endif %}"
       assertEqual(rawText+"foo", render(postRaw, { var: 'foo' }));
+    },
+
+    "{% increment counter }": function(){
+      assertEqual("0",     render("{% increment counter %}"));
+      assertEqual("0123",     render("{% increment counter1 %}{% increment counter1 %}{% increment counter1 %}{% increment counter1 %}"));
+      assertEqual("0101",     render("{% increment counter1 %}{% increment counter1 %}{% increment counter2 %}{% increment counter2 %}"));
+      assertEqual("01210",     render("{% assign counter1 = 10 %}{% increment counter1 %}{% increment counter1 %}{% increment counter1 %}{{ counter1 }}"));
+    },
+
+    "{% decrement counter }": function(){
+      assertEqual("-1",     render("{% decrement counter %}"));
+      assertEqual("-1-2-3-4",     render("{% decrement counter1 %}{% decrement counter1 %}{% decrement counter1 %}{% decrement counter1 %}"));
+      assertEqual("-1-2-1-2",     render("{% decrement counter1 %}{% decrement counter1 %}{% decrement counter2 %}{% decrement counter2 %}"));
+      assertEqual("-1-2-310",     render("{% assign counter1 = 10 %}{% decrement counter1 %}{% decrement counter1 %}{% decrement counter1 %}{{ counter1 }}"));
     },
 
     note4: "Testing context...",

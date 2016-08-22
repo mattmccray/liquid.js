@@ -491,3 +491,71 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
     return this.nodelist.join('');
   }
 }));
+
+Liquid.Template.registerTag( 'increment', Liquid.Tag.extend({
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)/,
+
+  init: function(tagName, markup, tokens) {
+    var parts = markup.match(this.tagSyntax);
+    console.log(tagName, markup, tokens);
+    console.log(parts[1]);
+    if( parts ) {
+      this.name = parts[1];
+    } else {
+      throw ("Syntax error in 'assign' - Valid syntax: increment [var]");
+    }
+    this._super(tagName, markup, tokens)
+  },
+  render: function(context) {
+    var self   = this,
+        key    = self.name,
+        output = '';
+
+    if(!context.registers['increment']) {
+      context.registers['increment'] = {};
+    }
+
+    if(!context.registers['increment'][key]) {
+      context.registers['increment'][key] = 0;
+    }
+
+    output = String(context.registers['increment'][key]);
+    context.registers['increment'][key]++;
+
+    return output;
+  }
+}));
+
+Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)/,
+
+  init: function(tagName, markup, tokens) {
+    var parts = markup.match(this.tagSyntax);
+    console.log(tagName, markup, tokens);
+    console.log(parts[1]);
+    if( parts ) {
+      this.name = parts[1];
+    } else {
+      throw ("Syntax error in 'assign' - Valid syntax: decrement [var]");
+    }
+    this._super(tagName, markup, tokens)
+  },
+  render: function(context) {
+    var self   = this,
+        key    = self.name,
+        output = '';
+
+    if(!context.registers['decrement']) {
+      context.registers['decrement'] = {};
+    }
+
+    if(!context.registers['decrement'][key]) {
+      context.registers['decrement'][key] = -1;
+    }
+
+    output = String(context.registers['decrement'][key]);
+    context.registers['decrement'][key]--;
+
+    return output;
+  }
+}));
