@@ -17,19 +17,6 @@ var Liquid = {
 
 };
 
-if (!String.prototype.capitalize) {
-  String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
-  };
-}
-
-if (!String.prototype.strip) {
-  String.prototype.strip = function() {
-    return this.replace(/^\s+/, '').replace(/\s+$/, '');
-  };
-}
-
-
 Liquid.extensions = {};
 Liquid.extensions.object = {};
 
@@ -52,6 +39,26 @@ Liquid.extensions.object.hasValue = function(arg) {
 
   return false;
 };
+
+Liquid.extensions.object.isEmpty = function(obj) {
+  if (!obj || Liquid.extensions.stringTools.strip(obj.toString()) === "") return true;
+  if (obj.length && obj.length > 0) return false;
+  if (typeof obj === 'number') return false;
+
+  for (var prop in obj) if (obj[prop]) return false;
+  return true;
+};
+
+
+Liquid.extensions.stringTools = {};
+Liquid.extensions.stringTools.capitalize = function(str) {
+  return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
+};
+
+Liquid.extensions.stringTools.strip = function(str) {
+  return str.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+
 
 Liquid.extensions.arrayTools = {};
 
@@ -884,7 +891,7 @@ Liquid.Template.registerTag( 'case', Liquid.Block.extend({
     }
   },
   recordElseCondition: function(markup) {
-    if( (markup || '').strip() != '') {
+    if( Liquid.extensions.stringTools.strip((markup || '')) != '') {
       throw ("Syntax error in tag 'case' - Valid else condition: {% else %} (no parameters) ")
     }
     var block = new Liquid.ElseCondition();
@@ -970,7 +977,7 @@ Liquid.Template.registerTag( 'for', Liquid.Block.extend({
       if(attMatchs) {
         Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
-          this.attributes[pair[0].strip()] = pair[1].strip();
+          this.attributes[Liquid.extensions.stringTools.strip(pair[0])] = Liquid.extensions.stringTools.strip(pair[1]);
         }, this);
       }
     } else {
@@ -1128,7 +1135,7 @@ Liquid.Template.registerTag( 'include', Liquid.Tag.extend({
       if(attMatchs) {
         Liquid.extensions.arrayTools.each(attMatchs, function(pair){
           pair = pair.split(":");
-          this.attributes[pair[0].strip()] = pair[1].strip();
+          this.attributes[Liquid.extensions.stringTools.strip(pair[0])] = Liquid.extensions.stringTools.strip(pair[1]);
         }, this);
       }
     } else {
@@ -1217,6 +1224,74 @@ Liquid.Template.registerTag( 'raw', Liquid.Block.extend({
     return this.nodelist.join('');
   }
 }));
+
+Liquid.Template.registerTag( 'increment', Liquid.Tag.extend({
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)/,
+
+  init: function(tagName, markup, tokens) {
+    var parts = markup.match(this.tagSyntax);
+    console.log(tagName, markup, tokens);
+    console.log(parts[1]);
+    if( parts ) {
+      this.name = parts[1];
+    } else {
+      throw ("Syntax error in 'assign' - Valid syntax: increment [var]");
+    }
+    this._super(tagName, markup, tokens)
+  },
+  render: function(context) {
+    var self   = this,
+        key    = self.name,
+        output = '';
+
+    if(!context.registers['increment']) {
+      context.registers['increment'] = {};
+    }
+
+    if(!context.registers['increment'][key]) {
+      context.registers['increment'][key] = 0;
+    }
+
+    output = String(context.registers['increment'][key]);
+    context.registers['increment'][key]++;
+
+    return output;
+  }
+}));
+
+Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
+  tagSyntax: /((?:\(?[\w\-\.\[\]]\)?)+)/,
+
+  init: function(tagName, markup, tokens) {
+    var parts = markup.match(this.tagSyntax);
+    console.log(tagName, markup, tokens);
+    console.log(parts[1]);
+    if( parts ) {
+      this.name = parts[1];
+    } else {
+      throw ("Syntax error in 'assign' - Valid syntax: decrement [var]");
+    }
+    this._super(tagName, markup, tokens)
+  },
+  render: function(context) {
+    var self   = this,
+        key    = self.name,
+        output = '';
+
+    if(!context.registers['decrement']) {
+      context.registers['decrement'] = {};
+    }
+
+    if(!context.registers['decrement'][key]) {
+      context.registers['decrement'][key] = -1;
+    }
+
+    output = String(context.registers['decrement'][key]);
+    context.registers['decrement'][key]--;
+
+    return output;
+  }
+}));
 Liquid.Template.registerFilter({
 
   _HTML_ESCAPE_MAP: {
@@ -1240,7 +1315,7 @@ Liquid.Template.registerFilter({
   },
 
   capitalize: function(input) {
-    return input.toString().capitalize();
+    return Liquid.extensions.stringTools.capitalize(input.toString());
   },
 
   escape: function(input) {
@@ -1255,6 +1330,10 @@ Liquid.Template.registerFilter({
     return input.replace(/[&<>"']/g, function(chr) {
       return self._HTML_ESCAPE_MAP[chr];
     });
+  },
+
+  default: function(input, default_value) {
+    return Liquid.extensions.object.isEmpty(input) ? default_value : input;
   },
 
   truncate: function(input, length, string) {
