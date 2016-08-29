@@ -1292,6 +1292,38 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
     return output;
   }
 }));
+(function(Liquid){
+
+var Money = {
+  getCurrencySign: function(){
+    var currencySign = '$';
+    return currencySign + ' ';
+  },
+  getCurrencyCode: function(){
+    var currencyCode = '';
+    return currencyCode ? ' ' + currencyCode : '';
+  },
+  format: function(num){
+    var ret = '0.00';
+    try{
+      num = parseFloat(('' + num) || ret);
+      num = Math.round(num * 100) / 100;
+      var tokens = ('' + num).match(/^(-?\d+)(.(\d+))?$/) || [];
+      var digit = tokens[1] || '0';
+      var dp = ((tokens[3] || '') + '00').substr(0, 2);
+      ret = digit + '.' + dp;
+    } catch(e){}
+    return ret;
+  },
+  trimZero: function(num){
+    var ret = '0';
+    try{
+      ret = parseFloat('' + num) + '';
+    } catch(e){}
+    return ret;
+  }
+};
+
 Liquid.Template.registerFilter({
 
   _HTML_ESCAPE_MAP: {
@@ -1473,9 +1505,27 @@ Liquid.Template.registerFilter({
 
   append: function(input, string) {
     return '' + (input || '').toString() + (string || '').toString();
-  }
+  },
+
+  money: function(input){
+    return Money.getCurrencySign() + Money.format(input);
+  },
+
+  money_with_currency: function(input){
+    return Money.getCurrencySign() + Money.format(input) + Money.getCurrencyCode();
+  },
+
+  money_without_trailing_zeros: function(input){
+    return Money.getCurrencySign() + Money.trimZero(input);
+  },
+
+  money_without_currency: function(input){
+    return Money.format(input);
+  },
 
 });
+
+})(Liquid);
 
 
 if(!(new Date()).strftime) {(function(){
