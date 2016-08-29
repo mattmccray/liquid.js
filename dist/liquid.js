@@ -1230,8 +1230,6 @@ Liquid.Template.registerTag( 'increment', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
@@ -1264,8 +1262,6 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
@@ -1296,29 +1292,30 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
 
 var Money = {
   getCurrencySign: function(){
-    var currencySign = '$';
-    return currencySign + ' ';
+    var currencySign = '$'; // TODO: configurable currency
+    return currencySign;
   },
   getCurrencyCode: function(){
-    var currencyCode = '';
+    var currencyCode = ''; // TODO: configurable currency
     return currencyCode ? ' ' + currencyCode : '';
   },
-  format: function(num){
+  format: function(num, currencySign, trimZero){
     var ret = '0.00';
     try{
       num = parseFloat(('' + num) || ret);
-      num = Math.round(num * 100) / 100;
-      var tokens = ('' + num).match(/^(-?\d+)(.(\d+))?$/) || [];
-      var digit = tokens[1] || '0';
-      var dp = ((tokens[3] || '') + '00').substr(0, 2);
-      ret = digit + '.' + dp;
-    } catch(e){}
-    return ret;
-  },
-  trimZero: function(num){
-    var ret = '0';
-    try{
-      ret = parseFloat('' + num) + '';
+      if(trimZero !== true){
+        num = Math.round(num * 100) / 100;
+      }
+      var tokens = ('' + num).match(/^(-?)(\d+)(.(\d+))?$/) || [];
+      var sign = tokens[1] || '';
+      var digit = tokens[2] || '0';
+      var dp = ((tokens[4] || '') + '00');
+      if(trimZero){
+        dp = dp.replace(/0+$/, '');
+      }else{
+        dp = dp.substr(0, 2);
+      }
+      ret = sign + currencySign + digit + (dp.length > 0 ? '.' + dp : '');
     } catch(e){}
     return ret;
   }
@@ -1508,19 +1505,19 @@ Liquid.Template.registerFilter({
   },
 
   money: function(input){
-    return Money.getCurrencySign() + Money.format(input);
+    return Money.format(input, Money.getCurrencySign(), false);
   },
 
   money_with_currency: function(input){
-    return Money.getCurrencySign() + Money.format(input) + Money.getCurrencyCode();
+    return Money.format(input, Money.getCurrencySign(), false) + Money.getCurrencyCode();
   },
 
   money_without_trailing_zeros: function(input){
-    return Money.getCurrencySign() + Money.trimZero(input);
+    return Money.format(input, Money.getCurrencySign(), true);
   },
 
   money_without_currency: function(input){
-    return Money.format(input);
+    return Money.format(input, '', false);
   },
 
 });

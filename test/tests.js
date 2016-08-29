@@ -349,53 +349,81 @@ var Tests = (function() {
     },
 
     '{{ number | money }}': function() {
-      assertEqual( '$ 10.00', render("{{ num | money }}", { num: 10 }) );
-      assertEqual( '$ 1.00', render("{{ num | money }}", { num: 1 }) );
-      assertEqual( '$ 0.10', render("{{ num | money }}", { num: 0.1 }) );
-      assertEqual( '$ 0.01', render("{{ num | money }}", { num: 0.01 }) );
-      assertEqual( '$ 0.00', render("{{ num | money }}", { num: 0.001 }) );
-      assertEqual( '$ 12.00', render("{{ num | money }}", { num: 12 }) );
-      assertEqual( '$ 12.30', render("{{ num | money }}", { num: 12.3 }) );
-      assertEqual( '$ 12.34', render("{{ num | money }}", { num: 12.34 }) );
-      assertEqual( '$ 12.35', render("{{ num | money }}", { num: 12.345 }) );
-      assertEqual( '$ 12.34', render("{{ num | money }}", { num: 12.343 }) );
+      assertEqual( '$10.00', render("{{ num | money }}", { num: 10 }) );
+      assertEqual( '$1.00', render("{{ num | money }}", { num: 1 }) );
+      assertEqual( '$0.10', render("{{ num | money }}", { num: 0.1 }) );
+      assertEqual( '$0.01', render("{{ num | money }}", { num: 0.01 }) );
+      assertEqual( '$0.00', render("{{ num | money }}", { num: 0.001 }) );
+      assertEqual( '$12.00', render("{{ num | money }}", { num: 12 }) );
+      assertEqual( '$12.30', render("{{ num | money }}", { num: 12.3 }) );
+      assertEqual( '$12.34', render("{{ num | money }}", { num: 12.34 }) );
+      assertEqual( '$12.34', render("{{ num | money }}", { num: 12.343 }) );
+      assertEqual( '$12.35', render("{{ num | money }}", { num: 12.345 }) );
+      assertEqual( '$12.35', render("{{ num | money }}", { num: 12.346 }) );
+      assertEqual( '-$12.00', render("{{ num | money }}", { num: -12 }) );
+      assertEqual( '-$12.30', render("{{ num | money }}", { num: -12.3 }) );
+      assertEqual( '-$12.34', render("{{ num | money }}", { num: -12.34 }) );
+      assertEqual( '-$12.34', render("{{ num | money }}", { num: -12.344 }) );
+      assertEqual( '-$12.34', render("{{ num | money }}", { num: -12.345 }) );
+      assertEqual( '-$12.35', render("{{ num | money }}", { num: -12.346 }) );
     },
 
     '{{ number | money_with_currency }}': function() {
-      assertEqual( '$ 10.00', render("{{ num | money_with_currency }}", { num: 10 }) );
-      assertEqual( '$ 1.00', render("{{ num | money_with_currency }}", { num: 1 }) );
-      assertEqual( '$ 0.10', render("{{ num | money_with_currency }}", { num: 0.1 }) );
-      assertEqual( '$ 0.01', render("{{ num | money_with_currency }}", { num: 0.01 }) );
-      assertEqual( '$ 0.00', render("{{ num | money_with_currency }}", { num: 0.001 }) );
-      assertEqual( '$ 12.00', render("{{ num | money_with_currency }}", { num: 12 }) );
-      assertEqual( '$ 12.30', render("{{ num | money_with_currency }}", { num: 12.3 }) );
-      assertEqual( '$ 12.34', render("{{ num | money_with_currency }}", { num: 12.34 }) );
-      assertEqual( '$ 12.35', render("{{ num | money_with_currency }}", { num: 12.345 }) );
-      assertEqual( '$ 12.34', render("{{ num | money_with_currency }}", { num: 12.343 }) );
+      assertEqual( '$10.00', render("{{ num | money_with_currency }}", { num: 10 }) );
+      assertEqual( '$1.00', render("{{ num | money_with_currency }}", { num: 1 }) );
+      assertEqual( '$0.10', render("{{ num | money_with_currency }}", { num: 0.1 }) );
+      assertEqual( '$0.01', render("{{ num | money_with_currency }}", { num: 0.01 }) );
+      assertEqual( '$0.00', render("{{ num | money_with_currency }}", { num: 0.001 }) );
+      assertEqual( '$12.00', render("{{ num | money_with_currency }}", { num: 12 }) );
+      assertEqual( '$12.30', render("{{ num | money_with_currency }}", { num: 12.3 }) );
+      assertEqual( '$12.34', render("{{ num | money_with_currency }}", { num: 12.34 }) );
+      assertEqual( '$12.34', render("{{ num | money_with_currency }}", { num: 12.344 }) );
+      assertEqual( '$12.35', render("{{ num | money_with_currency }}", { num: 12.345 }) );
+      assertEqual( '$12.35', render("{{ num | money_with_currency }}", { num: 12.346 }) );
+      assertEqual( '-$12.00', render("{{ num | money_with_currency }}", { num: -12 }) );
+      assertEqual( '-$12.30', render("{{ num | money_with_currency }}", { num: -12.3 }) );
+      assertEqual( '-$12.34', render("{{ num | money_with_currency }}", { num: -12.34 }) );
+      assertEqual( '-$12.34', render("{{ num | money_with_currency }}", { num: -12.344 }) );
+      assertEqual( '-$12.34', render("{{ num | money_with_currency }}", { num: -12.345 }) );
+      assertEqual( '-$12.35', render("{{ num | money_with_currency }}", { num: -12.346 }) );
     },
 
     '{{ number | money_without_trailing_zeros }}': function() {
-      assertEqual( '$ 10', render("{{ num | money_without_trailing_zeros }}", { num: 10 }) );
-      assertEqual( '$ 1', render("{{ num | money_without_trailing_zeros }}", { num: 1 }) );
-      assertEqual( '$ 0.1', render("{{ num | money_without_trailing_zeros }}", { num: 0.1 }) );
-      assertEqual( '$ 0.01', render("{{ num | money_without_trailing_zeros }}", { num: 0.01 }) );
-      assertEqual( '$ 0.001', render("{{ num | money_without_trailing_zeros }}", { num: 0.001 }) );
-      assertEqual( '$ 12', render("{{ num | money_without_trailing_zeros }}", { num: 12 }) );
-      assertEqual( '$ 12.3', render("{{ num | money_without_trailing_zeros }}", { num: 12.3 }) );
-      assertEqual( '$ 12.34', render("{{ num | money_without_trailing_zeros }}", { num: 12.34 }) );
-      assertEqual( '$ 12.345', render("{{ num | money_without_trailing_zeros }}", { num: 12.345 }) );
-      assertEqual( '$ 12.343', render("{{ num | money_without_trailing_zeros }}", { num: 12.343 }) );
-      assertEqual( '$ 100', render("{{ num | money_without_trailing_zeros }}", { num: '100' }) );
-      assertEqual( '$ 10', render("{{ num | money_without_trailing_zeros }}", { num: '10' }) );
-      assertEqual( '$ 1', render("{{ num | money_without_trailing_zeros }}", { num: '1' }) );
-      assertEqual( '$ 100', render("{{ num | money_without_trailing_zeros }}", { num: '100.00' }) );
-      assertEqual( '$ 10', render("{{ num | money_without_trailing_zeros }}", { num: '10.00' }) );
-      assertEqual( '$ 1', render("{{ num | money_without_trailing_zeros }}", { num: '1.00' }) );
-      assertEqual( '$ 12', render("{{ num | money_without_trailing_zeros }}", { num: '12.00' }) );
-      assertEqual( '$ 12.3', render("{{ num | money_without_trailing_zeros }}", { num: '12.30' }) );
-      assertEqual( '$ 12.34', render("{{ num | money_without_trailing_zeros }}", { num: '12.340' }) );
-      assertEqual( '$ 12.345', render("{{ num | money_without_trailing_zeros }}", { num: '12.3450' }) );
-      assertEqual( '$ 12.343', render("{{ num | money_without_trailing_zeros }}", { num: '12.3430' }) );
+      assertEqual( '$10', render("{{ num | money_without_trailing_zeros }}", { num: 10 }) );
+      assertEqual( '$1', render("{{ num | money_without_trailing_zeros }}", { num: 1 }) );
+      assertEqual( '$0.1', render("{{ num | money_without_trailing_zeros }}", { num: 0.1 }) );
+      assertEqual( '$0.01', render("{{ num | money_without_trailing_zeros }}", { num: 0.01 }) );
+      assertEqual( '$0.001', render("{{ num | money_without_trailing_zeros }}", { num: 0.001 }) );
+      assertEqual( '$12', render("{{ num | money_without_trailing_zeros }}", { num: 12 }) );
+      assertEqual( '$12.3', render("{{ num | money_without_trailing_zeros }}", { num: 12.3 }) );
+      assertEqual( '$12.34', render("{{ num | money_without_trailing_zeros }}", { num: 12.34 }) );
+      assertEqual( '$12.344', render("{{ num | money_without_trailing_zeros }}", { num: 12.344 }) );
+      assertEqual( '$12.345', render("{{ num | money_without_trailing_zeros }}", { num: 12.345 }) );
+      assertEqual( '$12.346', render("{{ num | money_without_trailing_zeros }}", { num: 12.346 }) );
+      assertEqual( '$100', render("{{ num | money_without_trailing_zeros }}", { num: '100' }) );
+      assertEqual( '$10', render("{{ num | money_without_trailing_zeros }}", { num: '10' }) );
+      assertEqual( '$1', render("{{ num | money_without_trailing_zeros }}", { num: '1' }) );
+      assertEqual( '$100', render("{{ num | money_without_trailing_zeros }}", { num: '100.00' }) );
+      assertEqual( '$10', render("{{ num | money_without_trailing_zeros }}", { num: '10.00' }) );
+      assertEqual( '$1', render("{{ num | money_without_trailing_zeros }}", { num: '1.00' }) );
+      assertEqual( '$12', render("{{ num | money_without_trailing_zeros }}", { num: '12.00' }) );
+      assertEqual( '$12.3', render("{{ num | money_without_trailing_zeros }}", { num: '12.30' }) );
+      assertEqual( '$12.34', render("{{ num | money_without_trailing_zeros }}", { num: '12.340' }) );
+      assertEqual( '$12.344', render("{{ num | money_without_trailing_zeros }}", { num: '12.3440' }) );
+      assertEqual( '$12.345', render("{{ num | money_without_trailing_zeros }}", { num: '12.3450' }) );
+      assertEqual( '$12.346', render("{{ num | money_without_trailing_zeros }}", { num: '12.3460' }) );
+      assertEqual( '-$12', render("{{ num | money_without_trailing_zeros }}", { num: -12 }) );
+      assertEqual( '-$12.3', render("{{ num | money_without_trailing_zeros }}", { num: -12.3 }) );
+      assertEqual( '-$12.34', render("{{ num | money_without_trailing_zeros }}", { num: -12.34 }) );
+      assertEqual( '-$12.344', render("{{ num | money_without_trailing_zeros }}", { num: -12.344 }) );
+      assertEqual( '-$12.345', render("{{ num | money_without_trailing_zeros }}", { num: -12.345 }) );
+      assertEqual( '-$12.346', render("{{ num | money_without_trailing_zeros }}", { num: -12.346 }) );
+      assertEqual( '-$12', render("{{ num | money_without_trailing_zeros }}", { num: '-12.00' }) );
+      assertEqual( '-$12.3', render("{{ num | money_without_trailing_zeros }}", { num: '-12.30' }) );
+      assertEqual( '-$12.34', render("{{ num | money_without_trailing_zeros }}", { num: '-12.340' }) );
+      assertEqual( '-$12.344', render("{{ num | money_without_trailing_zeros }}", { num: '-12.3440' }) );
+      assertEqual( '-$12.345', render("{{ num | money_without_trailing_zeros }}", { num: '-12.3450' }) );
+      assertEqual( '-$12.346', render("{{ num | money_without_trailing_zeros }}", { num: '-12.3460' }) );
     },
 
     '{{ number | money_without_currency }}': function() {
@@ -407,8 +435,15 @@ var Tests = (function() {
       assertEqual( '12.00', render("{{ num | money_without_currency }}", { num: 12 }) );
       assertEqual( '12.30', render("{{ num | money_without_currency }}", { num: 12.3 }) );
       assertEqual( '12.34', render("{{ num | money_without_currency }}", { num: 12.34 }) );
+      assertEqual( '12.34', render("{{ num | money_without_currency }}", { num: 12.344 }) );
       assertEqual( '12.35', render("{{ num | money_without_currency }}", { num: 12.345 }) );
-      assertEqual( '12.34', render("{{ num | money_without_currency }}", { num: 12.343 }) );
+      assertEqual( '12.35', render("{{ num | money_without_currency }}", { num: 12.346 }) );
+      assertEqual( '-12.00', render("{{ num | money_without_currency }}", { num: -12 }) );
+      assertEqual( '-12.30', render("{{ num | money_without_currency }}", { num: -12.3 }) );
+      assertEqual( '-12.34', render("{{ num | money_without_currency }}", { num: -12.34 }) );
+      assertEqual( '-12.34', render("{{ num | money_without_currency }}", { num: -12.344 }) );
+      assertEqual( '-12.34', render("{{ num | money_without_currency }}", { num: -12.345 }) );
+      assertEqual( '-12.35', render("{{ num | money_without_currency }}", { num: -12.346 }) );
     },
 
     note3: "Testing tags...",

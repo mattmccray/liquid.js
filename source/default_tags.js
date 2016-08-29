@@ -497,8 +497,6 @@ Liquid.Template.registerTag( 'increment', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
@@ -531,8 +529,6 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
