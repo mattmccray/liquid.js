@@ -1479,6 +1479,19 @@ Liquid.Template.registerFilter({
     return (Number(input) || 0) % (Number(number) || 0);
   },
 
+  ceil: function(input) {
+    return Math.ceil(Number(input) || 0);
+  },
+
+  floor: function(input) {
+    return Math.floor(Number(input) || 0);
+  },
+
+  round: function(input, dp) {
+    let pow = Math.pow(10, dp || 0);
+    return Math.round((Number(input) || 0) * pow) / pow;
+  },
+
   map: function(input, property) {
     input = input || [];
     var results = [];

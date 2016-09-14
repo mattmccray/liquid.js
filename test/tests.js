@@ -306,6 +306,26 @@ var Tests = (function() {
       assertEqual( '2', render("{{ x | modulo:y }}", {x:'8',y:'3'})  )
     },
 
+    '{{ number | ceil }}': function() {
+      assertEqual('2', render("{{x|ceil}}", { x: 1.2 }))
+      assertEqual('2', render("{{x|ceil}}", { x: 2.0 }))
+      assertEqual('184', render("{{x|ceil}}", { x: 183.357 }))
+      assertEqual('4', render("{{'3.5'|ceil}}"))
+    },
+
+    '{{ number | floor }}': function() {
+      assertEqual('1', render("{{x|floor}}", { x: 1.2 }))
+      assertEqual('2', render("{{x|floor}}", { x: 2.0 }))
+      assertEqual('183', render("{{x|floor}}", { x: 183.357 }))
+      assertEqual('3', render("{{'3.5'|floor}}"))
+    },
+
+    '{{ number | round }}': function() {
+      assertEqual('1', render("{{x|round}}", { x: 1.2 }))
+      assertEqual('3', render("{{x|round}}", { x: 2.7 }))
+      assertEqual('183.36', render("{{x|round:2}}", { x: 183.357 }))
+    },
+
     '{{ collection | map:y }}': function() {
       assertEqual( 'Tony,Pepper', render("{{people|map:'firstName'}}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
       assertEqual( 'Tony,Pepper', render("{{ people | map:'firstName' }}", {people:[{firstName:"Tony",lastName:"Stark"},{firstName:"Pepper",lastName:"Potts"}]})  )
