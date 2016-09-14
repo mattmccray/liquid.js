@@ -425,11 +425,11 @@ var Tests = (function() {
       assertEqual(" 0  1  2 ", render("{% for item in (1..3) %} {{ forloop.index0 }} {% endfor %}"));
       assertEqual(" true  false  false ", render("{% for item in (1..3) %} {{ forloop.first }} {% endfor %}"));
       assertEqual(" false  false  true ", render("{% for item in (1..3) %} {{ forloop.last }} {% endfor %}"));
-      // TODO: Add test for the rest of the forloop variables too...
       assertEqual(" 0  1  2 ", render("{% for item in data %} {{ item }} {% endfor %}", { data: [0, 1, 2] }));
       assertEqual(" 0  1  2 ", render("{% for item in (0..n) %} {{ item }} {% endfor %}", { n: 2 }));
       assertEqual(" 1  2  3 ", render("{% assign n = 3 %}{% for item in (1..n) %} {{ item }} {% endfor %}"));
       assertEqual(" 2  3  4 ", render("{% for item in (x..y) %} {{ item }} {% endfor %}", { x: 2, y: 4 }));
+      // TODO: Add test for the rest of the forloop variables too...
     },
 
     "{% if conditions %}{% else %}{% endif %}": function() {
