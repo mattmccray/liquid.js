@@ -406,16 +406,22 @@ Liquid.Context = Liquid.Class.extend({
               left  = parseInt(range[1]),
               right = parseInt(range[2]),
               arr   = [];
-          if (isNaN(left) || isNaN(right)) {
-            left = range[1].charCodeAt(0);
-            right = range[2].charCodeAt(0);
-
-            var limit = right-left+1;
-            for (var i=0; i<limit; i++) arr.push(String.fromCharCode(i+left));
-          } else { // okay to make array
-            var limit = right-left+1;
-            for (var i=0; i<limit; i++) arr.push(i+left);
+          if(isNaN(left)){
+            let varLeft = this.resolve(range[1]);
+            left = parseInt(varLeft);
+            if(isNaN(left)){
+              throw new Error('Incorrect param for range: ' + key);
+            }
           }
+          if(isNaN(right)){
+            let varRight = this.resolve(range[2]);
+            right = parseInt(varRight);
+            if(isNaN(right)){
+              throw new Error('Incorrect param for range: ' + key);
+            }
+          }
+          var limit = right-left+1;
+          for (var i=0; i<limit; i++) arr.push(i+left);
           return arr;
         } else {
           var result = this.variable(key);
