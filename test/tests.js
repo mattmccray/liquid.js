@@ -48,7 +48,7 @@ var Tests = (function() {
       assertEqual( '1,2,3,4,5', render('{{ (1..5) }}')  )
     },
     "{{ (a..e) }}": function() {
-      assertEqual( 'a,b,c,d,e', render('{{(a..e)}}')  )
+      assertEqual('1,2,3,4,5', render('{{(a..e)}}', { a: 1, e: 5 }))
     },
 
     '{{ varname }}': function() {
@@ -426,6 +426,10 @@ var Tests = (function() {
       assertEqual(" true  false  false ", render("{% for item in (1..3) %} {{ forloop.first }} {% endfor %}"));
       assertEqual(" false  false  true ", render("{% for item in (1..3) %} {{ forloop.last }} {% endfor %}"));
       // TODO: Add test for the rest of the forloop variables too...
+      assertEqual(" 0  1  2 ", render("{% for item in data %} {{ item }} {% endfor %}", { data: [0, 1, 2] }));
+      assertEqual(" 0  1  2 ", render("{% for item in (0..n) %} {{ item }} {% endfor %}", { n: 2 }));
+      assertEqual(" 1  2  3 ", render("{% assign n = 3 %}{% for item in (1..n) %} {{ item }} {% endfor %}"));
+      assertEqual(" 2  3  4 ", render("{% for item in (x..y) %} {{ item }} {% endfor %}", { x: 2, y: 4 }));
     },
 
     "{% if conditions %}{% else %}{% endif %}": function() {
