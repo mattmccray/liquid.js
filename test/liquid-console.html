@@ -1,4 +1,23 @@
 <html>
+  <style>
+    .input-wrapper {
+      display: inline-block;
+      width: 33%;
+      vertical-align: top;
+    }
+    label {
+      display: block;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+    }
+    .output-wrapper {
+      display: inline-block;
+      width: 49%;
+      vertical-align: top;
+    }
+  </style>
   <script src="../dist/liquid.js"></script>
   <script>
     var TopUserDrop = Liquid.Drop.extend({
@@ -6,17 +25,14 @@
         return "Top User Name!!!"
       }
     });
-    
+
     // Liquid.newDrop('topUser', {
     //   name: function() {
     //     return "Sure";
     //   }
     // })
-    
-    function parseIt() {
-      var src = document.getElementById('src').value;
-      var tmpl = Liquid.parse(src);
-      var html = tmpl.renderWithErrors({
+
+    test = {
         topUser: new TopUserDrop(),
         user: 'DarthAPO',
         today: new Date(),
@@ -25,11 +41,22 @@
           { name:'Dan' },
           { name:'Sam' }
         ]
-      });
+      };
+
+    function parseIt() {
+      var data = document.getElementById('data').value;
+      var src = document.getElementById('src').value;
+      var tmpl = Liquid.parse(src);
+      try{
+        data = JSON.parse(data.trim());
+      }catch(e){
+        console.log('JSON Parse Error', e);
+      }
+      var html = tmpl.renderWithErrors(data);
       document.getElementById('output').value = html;
       document.getElementById('outputHTML').innerHTML = html;
     }
-    
+
     Liquid.readTemplateFile = function(path) {
       var elem = document.getElementById(path);
       if( elem ) {
@@ -40,7 +67,24 @@
     }
   </script>
   <body>
-    <textarea id="src" rows="10" cols="60">{{ user }} says hi!
+    <div class="input-wrapper">
+      <label for="data">Data</label>
+      <textarea id="data">
+{
+  "topUser": {},
+  "user":"DarthAPO",
+  "today":"2016-08-29T07:31:18.788Z",
+  "users":[
+    {"name":"Matt"},
+    {"name":"Dan"},
+    {"name":"Sam"}
+  ]
+}
+      </textarea>
+    </div>
+    <div class="input-wrapper">
+      <label for="src">Liquid Template</label>
+      <textarea id="src">{{ user }} says hi!
 
 {% for user in users %}
   * {{ user.name }}
@@ -50,14 +94,21 @@ Maybe: {{ users.0.name }}
 
 {% include 'testInclude' with user %}
 
-The end.</textarea><br/>
-      <button onclick="parseIt()">Parse</button>
-      <hr/>
-      <textarea id="output" rows="10" cols="60"></textarea><br/>
-      Rendered:
-      <div id="outputHTML">
-      </div>
-      Template:
-      <textarea id="testInclude" rows="10" cols="60">Hello! {{ user }}, how are you?</textarea>
+The end.</textarea>
+    </div>
+    <div class="input-wrapper">
+      <label for="testInclude">Include Template</label>
+      <textarea id="testInclude">Hello! {{ user }}, how are you?</textarea>
+    </div>
+    <button onclick="parseIt()">Parse</button>
+    <hr/>
+    <div class="output-wrapper">
+      <label for="output">Template Output</label>
+      <textarea id="output"></textarea><br/>
+    </div>
+    <div class="output-wrapper">
+      <label for="outputHTML">Rendered</label>
+      <div id="outputHTML"></div>
+    </div>
   </body>
 </html>

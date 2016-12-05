@@ -1236,8 +1236,6 @@ Liquid.Template.registerTag( 'increment', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
@@ -1270,8 +1268,6 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
 
   init: function(tagName, markup, tokens) {
     var parts = markup.match(this.tagSyntax);
-    console.log(tagName, markup, tokens);
-    console.log(parts[1]);
     if( parts ) {
       this.name = parts[1];
     } else {
@@ -1298,6 +1294,39 @@ Liquid.Template.registerTag( 'decrement', Liquid.Tag.extend({
     return output;
   }
 }));
+(function(Liquid){
+
+var Money = {
+  getCurrencySign: function(){
+    var currencySign = '$'; // TODO: configurable currency
+    return currencySign;
+  },
+  getCurrencyCode: function(){
+    var currencyCode = ''; // TODO: configurable currency
+    return currencyCode ? ' ' + currencyCode : '';
+  },
+  format: function(num, currencySign, trimZero){
+    var ret = '0.00';
+    try{
+      num = parseFloat(('' + num) || ret);
+      if(trimZero !== true){
+        num = Math.round(num * 100) / 100;
+      }
+      var tokens = ('' + num).match(/^(-?)(\d+)(.(\d+))?$/) || [];
+      var sign = tokens[1] || '';
+      var digit = tokens[2] || '0';
+      var dp = ((tokens[4] || '') + '00');
+      if(trimZero){
+        dp = dp.replace(/0+$/, '');
+      }else{
+        dp = dp.substr(0, 2);
+      }
+      ret = sign + currencySign + digit + (dp.length > 0 ? '.' + dp : '');
+    } catch(e){}
+    return ret;
+  }
+};
+
 Liquid.Template.registerFilter({
 
   _HTML_ESCAPE_MAP: {
@@ -1450,6 +1479,19 @@ Liquid.Template.registerFilter({
     return (Number(input) || 0) % (Number(number) || 0);
   },
 
+  ceil: function(input) {
+    return Math.ceil(Number(input) || 0);
+  },
+
+  floor: function(input) {
+    return Math.floor(Number(input) || 0);
+  },
+
+  round: function(input, dp) {
+    let pow = Math.pow(10, dp || 0);
+    return Math.round((Number(input) || 0) * pow) / pow;
+  },
+
   map: function(input, property) {
     input = input || [];
     var results = [];
@@ -1479,9 +1521,27 @@ Liquid.Template.registerFilter({
 
   append: function(input, string) {
     return '' + (input || '').toString() + (string || '').toString();
-  }
+  },
+
+  money: function(input){
+    return Money.format(input, Money.getCurrencySign(), false);
+  },
+
+  money_with_currency: function(input){
+    return Money.format(input, Money.getCurrencySign(), false) + Money.getCurrencyCode();
+  },
+
+  money_without_trailing_zeros: function(input){
+    return Money.format(input, Money.getCurrencySign(), true);
+  },
+
+  money_without_currency: function(input){
+    return Money.format(input, '', false);
+  },
 
 });
+
+})(Liquid);
 
 
 if(!(new Date()).strftime) {(function(){
