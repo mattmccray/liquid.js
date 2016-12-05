@@ -18,7 +18,8 @@ Liquid.Block = Liquid.Tag.extend({
     while(tokens.length) { 
 
       if( /^\{\%/.test(token) ) { // It's a tag...
-        var tagParts = token.match(/^\{\%\s*(\w+)\s*(.*)?\%\}$/);
+        this.whitespaceHandler(token, tokens);
+        var tagParts = token.match(/^\{\%-?\s*(\w+)\s*(.*?)-?\%\}$/);
         
         if(tagParts) {
           // if we found the proper block delimitor just end parsing here and let the outer block proceed
@@ -35,6 +36,7 @@ Liquid.Block = Liquid.Tag.extend({
           throw ( "Tag '"+ token +"' was not properly terminated with: %}");
         }
       } else if(/^\{\{/.test(token)) { // It's a variable...
+        this.whitespaceHandler(token, tokens);
         this.nodelist.push( this.createVariable(token) );
       } else { //if(token != '') {
         this.nodelist.push( token );
@@ -57,7 +59,7 @@ Liquid.Block = Liquid.Tag.extend({
   },
   
   createVariable: function(token) {
-    var match = token.match(/^\{\{(.*)\}\}$/);
+    var match = token.match(/^\{\{-?(.*?)-?\}\}$/);
     if(match) { return new Liquid.Variable(match[1]); }
     else { throw ("Variable '"+ token +"' was not properly terminated with: }}"); }
   },
@@ -80,5 +82,25 @@ Liquid.Block = Liquid.Tag.extend({
   
   assertMissingDelimitation: function(){
     throw (this.blockName +" tag was never closed");
+  },
+  
+  whitespaceHandler: function (token, tokens) {
+    // We want to remove a preceding whitespace
+    if (token[2] == '-') {
+      // if the previous token trims to nothing it was only whitespace
+      if (this.nodelist.length > 0 && this.nodelist[this.nodelist.length - 1].trim() === '') {
+        // previous token is a whitespace remove it
+        this.nodelist.pop();
+      }
+    }
+
+    // We want to remove a following whitespace
+    if (token[token.length - 3] === '-') {
+      // if the next token trims to nothing it was only whitespace
+      if (tokens.length > 0 && tokens[0].trim() === '') {
+        // next token is a whitespace remove it
+        tokens.shift();
+      }
+    }
   }
 });

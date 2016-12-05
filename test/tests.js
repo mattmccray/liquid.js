@@ -15,7 +15,7 @@ var Tests = (function() {
       assertDefined( typeof Liquid.Template,  "Liquid.Template is missing" );
       assertDefined( typeof Liquid.Drop,      "Liquid.Drop is missing" );
       assertDefined( typeof Liquid.Tag,       "Liquid.Tag is missing" );
-      assertDefined( typeof Liquid.Block,     "Liquid.Tag is missing" );
+      assertDefined( typeof Liquid.Block,     "Liquid.Block is missing" );
     },
 
     "Plain text pass-thru": function() {
@@ -513,6 +513,18 @@ var Tests = (function() {
       // TODO Consider using a Context object directly instead, calling variable on it directly
       assertEqual("", render("{{ collection['missing_key'].value }}"))
       assertEqual("", render("{{ collection['missing_key'].value }}", {collection: {}}))
+    },
+
+    note5: "Testing whitespace...",
+
+    "{{ 'whitespace' }}": function() {
+      assertEqual( '\nwhitespace\n', render('\n{{"whitespace"}}\n')  )
+      assertEqual( ' whitespace ', render(' {{"whitespace"}} ')  )
+      assertEqual( 'whitespace', render('{{-"whitespace"-}}')  )
+      assertEqual( 'whitespace', render(' {{-"whitespace"-}} ')  )
+      assertEqual( 'whitespace', render('\n{{-"whitespace"-}}\n')  )
+      assertEqual( 'whitespace ', render(' {{-"whitespace"}} ')  )
+      assertEqual( ' whitespace', render(' {{"whitespace"-}} ')  )
     }
   }
 })();
