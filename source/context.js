@@ -102,14 +102,14 @@ Liquid.Context = Liquid.Class.extend({
               arr   = [];
           // Check if left and right are NaN, if so try as characters
           if(isNaN(left)){
-            let varLeft = this.resolve(range[1]);
+            var varLeft = this.resolve(range[1]);
             left = parseInt(varLeft);
             if(isNaN(left)){
               throw new Error('Incorrect param for range: ' + key);
             }
           }
           if(isNaN(right)){
-            let varRight = this.resolve(range[2]);
+            var varRight = this.resolve(range[2]);
             right = parseInt(varRight);
             if(isNaN(right)){
               throw new Error('Incorrect param for range: ' + key);
